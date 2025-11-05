@@ -531,7 +531,7 @@ function Globe3D({
 
       {/* VFX Пост-обработка */}
       <EffectComposer multisampling={0} enabled={bloomEnabled || chromaticAberrationEnabled || depthOfFieldEnabled || filmGrainEnabled}>
-        {bloomEnabled && (
+        {bloomEnabled ? (
           <Bloom
             intensity={bloomIntensity}
             luminanceThreshold={0.2}
@@ -539,27 +539,27 @@ function Globe3D({
             radius={bloomRadius}
             mipmapBlur
           />
-        )}
-        {chromaticAberrationEnabled && (
+        ) : null}
+        {chromaticAberrationEnabled ? (
           <ChromaticAberration
             offset={new THREE.Vector2(chromaticAberrationOffset, chromaticAberrationOffset)}
             blendFunction={BlendFunction.NORMAL}
           />
-        )}
-        {depthOfFieldEnabled && (
+        ) : null}
+        {depthOfFieldEnabled ? (
           <DepthOfField
             focusDistance={depthOfFieldFocusDistance}
             focalLength={depthOfFieldFocalLength}
             bokehScale={2}
             height={480}
           />
-        )}
-        {filmGrainEnabled && (
+        ) : null}
+        {filmGrainEnabled ? (
           <Noise
             opacity={filmGrainIntensity}
             blendFunction={BlendFunction.OVERLAY}
           />
-        )}
+        ) : null}
       </EffectComposer>
     </>
   );
