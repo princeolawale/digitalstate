@@ -4,6 +4,7 @@ import { useRef, useMemo, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Stats } from "@react-three/drei";
 import * as THREE from "three";
+import { EarthLayers } from "./EarthLayers";
 
 interface GlobePoint {
   position: [number, number, number];
@@ -23,6 +24,20 @@ interface GlobeProps {
   effectStrength?: number;
   returnSpeed?: number;
   rotationSpeed?: number;
+  cloudsOpacity?: number;
+  cloudsSpeed?: number;
+  earthOpacity?: number;
+  earthTransparency?: number;
+  earthMaskIntensity?: number;
+  earthTextureIntensity?: number;
+  nightLightsColor?: string;
+  nightLightsIntensity?: number;
+  nightLightsBrightness?: number;
+  pointsColor?: string;
+  landPointsOpacity?: number;
+  landPointsSize?: number;
+  oceanPointsOpacity?: number;
+  oceanPointsSize?: number;
 }
 
 interface RawPoint {
@@ -97,8 +112,13 @@ function GlobePoints({
   cameraPosition,
   interactiveEffect = false,
   mouseVelocity,
-  effectStrength = 1,
+  effectStrength = 4.4,
   returnSpeed = 0.92,
+  pointsColor = "#ffffff",
+  landPointsOpacity = 0.8,
+  landPointsSize = 0.008,
+  oceanPointsOpacity = 0.5,
+  oceanPointsSize = 0.006,
 }: {
   points: GlobePoint[];
   showBackHemisphere: boolean;
@@ -109,24 +129,13 @@ function GlobePoints({
   mouseVelocity?: THREE.Vector2;
   effectStrength?: number;
   returnSpeed?: number;
+  pointsColor?: string;
+  landPointsOpacity?: number;
+  landPointsSize?: number;
+  oceanPointsOpacity?: number;
+  oceanPointsSize?: number;
 }) {
   const pointsRef = useRef<THREE.Group>(null);
-  // Определяем яркость цвета для выбора контрастного цвета точек
-  const getContrastColor = (hexColor: string) => {
-    // Конвертируем hex в RGB
-    const hex = hexColor.replace("#", "");
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-
-    // Вычисляем яркость (luminance)
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-    // Если фон светлый, возвращаем тёмные точки, иначе светлые
-    return luminance > 0.5 ? "#000000" : "#ffffff";
-  };
-
-  const pointColor = getContrastColor(backgroundColor);
 
   // Инициализируем offset для каждой точки
   const [pointOffsets, setPointOffsets] = useState<Map<number, THREE.Vector3>>(
@@ -210,28 +219,28 @@ function GlobePoints({
   }, [points, showBackHemisphere, globeRotation, cameraPosition]);
 
   // Оптимизация: переиспользуем геометрию и материалы
-  const landGeometry = useMemo(() => new THREE.SphereGeometry(0.01, 6, 6), []);
+  const landGeometry = useMemo(() => new THREE.SphereGeometry(landPointsSize, 6, 6), [landPointsSize]);
   const oceanGeometry = useMemo(
-    () => new THREE.SphereGeometry(0.009, 6, 6),
-    []
+    () => new THREE.SphereGeometry(oceanPointsSize, 6, 6),
+    [oceanPointsSize]
   );
   const landMaterial = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
-        color: pointColor,
+        color: pointsColor,
         transparent: true,
-        opacity: 0.9,
+        opacity: landPointsOpacity,
       }),
-    [pointColor]
+    [pointsColor, landPointsOpacity]
   );
   const oceanMaterial = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
-        color: pointColor,
+        color: pointsColor,
         transparent: true,
-        opacity: 0.5,
+        opacity: oceanPointsOpacity,
       }),
-    [pointColor]
+    [pointsColor, oceanPointsOpacity]
   );
 
   return (
@@ -268,9 +277,23 @@ function Globe3D({
   backgroundColor = "#000000",
   showStats = false,
   interactiveEffect = false,
-  effectStrength = 1,
+  effectStrength = 4.4,
   returnSpeed = 0.92,
   rotationSpeed = 0.002,
+  cloudsOpacity = 0.25,
+  cloudsSpeed = 3,
+  earthOpacity = 1,
+  earthTransparency = 0.5,
+  earthMaskIntensity = 1,
+  earthTextureIntensity = 1,
+  nightLightsColor = "#ffaa44",
+  nightLightsIntensity = 1,
+  nightLightsBrightness = 3,
+  pointsColor = "#ffffff",
+  landPointsOpacity = 0.8,
+  landPointsSize = 0.008,
+  oceanPointsOpacity = 0.5,
+  oceanPointsSize = 0.006,
 }: GlobeProps) {
   const globeRef = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
@@ -414,10 +437,27 @@ function Globe3D({
 
   return (
     <>
-      <ambientLight intensity={0.3} />
-      <pointLight position={[10, 10, 10]} intensity={0.8} />
+      {/* Улучшенное освещение для текстур */}
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 3, 5]} intensity={1.2} />
+      <pointLight position={[-5, -3, -5]} intensity={0.4} color="#4488ff" />
 
-      {/* Группа для вращения только точек */}
+      {/* Слои Земли (текстуры + облака) - внутренние слои */}
+      <EarthLayers 
+        autoRotate={autoRotate} 
+        rotationSpeed={rotationSpeed}
+        cloudsOpacity={cloudsOpacity}
+        cloudsSpeed={cloudsSpeed}
+        earthOpacity={earthOpacity}
+        earthTransparency={earthTransparency}
+        earthMaskIntensity={earthMaskIntensity}
+        earthTextureIntensity={earthTextureIntensity}
+        nightLightsColor={nightLightsColor}
+        nightLightsIntensity={nightLightsIntensity}
+        nightLightsBrightness={nightLightsBrightness}
+      />
+
+      {/* Группа для вращения точек - внешний слой */}
       <group ref={globeRef}>
         <GlobePoints
           points={points}
@@ -429,6 +469,11 @@ function Globe3D({
           mouseVelocity={mouseVelocity}
           effectStrength={effectStrength}
           returnSpeed={returnSpeed}
+          pointsColor={pointsColor}
+          landPointsOpacity={landPointsOpacity}
+          landPointsSize={landPointsSize}
+          oceanPointsOpacity={oceanPointsOpacity}
+          oceanPointsSize={oceanPointsSize}
         />
       </group>
 
@@ -456,9 +501,23 @@ export default function GlobeCanvas({
   backgroundColor = "#000000",
   showStats = false,
   interactiveEffect = false,
-  effectStrength = 1,
+  effectStrength = 4.4,
   returnSpeed = 0.92,
   rotationSpeed = 0.002,
+  cloudsOpacity = 0.25,
+  cloudsSpeed = 3,
+  earthOpacity = 1,
+  earthTransparency = 0.5,
+  earthMaskIntensity = 1,
+  earthTextureIntensity = 1,
+  nightLightsColor = "#ffaa44",
+  nightLightsIntensity = 1,
+  nightLightsBrightness = 3,
+  pointsColor = "#ffffff",
+  landPointsOpacity = 0.8,
+  landPointsSize = 0.008,
+  oceanPointsOpacity = 0.5,
+  oceanPointsSize = 0.006,
 }: {
   showBackHemisphere?: boolean;
   autoRotate?: boolean;
@@ -468,6 +527,20 @@ export default function GlobeCanvas({
   effectStrength?: number;
   returnSpeed?: number;
   rotationSpeed?: number;
+  cloudsOpacity?: number;
+  cloudsSpeed?: number;
+  earthOpacity?: number;
+  earthTransparency?: number;
+  earthMaskIntensity?: number;
+  earthTextureIntensity?: number;
+  nightLightsColor?: string;
+  nightLightsIntensity?: number;
+  nightLightsBrightness?: number;
+  pointsColor?: string;
+  landPointsOpacity?: number;
+  landPointsSize?: number;
+  oceanPointsOpacity?: number;
+  oceanPointsSize?: number;
 }) {
   const [mounted, setMounted] = useState(false);
 
@@ -524,6 +597,20 @@ export default function GlobeCanvas({
           effectStrength={effectStrength}
           returnSpeed={returnSpeed}
           rotationSpeed={rotationSpeed}
+          cloudsOpacity={cloudsOpacity}
+          cloudsSpeed={cloudsSpeed}
+          earthOpacity={earthOpacity}
+          earthTransparency={earthTransparency}
+          earthMaskIntensity={earthMaskIntensity}
+          earthTextureIntensity={earthTextureIntensity}
+          nightLightsColor={nightLightsColor}
+          nightLightsIntensity={nightLightsIntensity}
+          nightLightsBrightness={nightLightsBrightness}
+          pointsColor={pointsColor}
+          landPointsOpacity={landPointsOpacity}
+          landPointsSize={landPointsSize}
+          oceanPointsOpacity={oceanPointsOpacity}
+          oceanPointsSize={oceanPointsSize}
         />
       </Canvas>
     </div>
