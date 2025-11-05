@@ -22,6 +22,7 @@ interface GlobeProps {
   interactiveEffect?: boolean;
   effectStrength?: number;
   returnSpeed?: number;
+  rotationSpeed?: number;
 }
 
 interface RawPoint {
@@ -269,6 +270,7 @@ function Globe3D({
   interactiveEffect = false,
   effectStrength = 1,
   returnSpeed = 0.92,
+  rotationSpeed = 0.002,
 }: GlobeProps) {
   const globeRef = useRef<THREE.Group>(null);
   const [points, setPoints] = useState<GlobePoint[]>([]);
@@ -345,7 +347,7 @@ function Globe3D({
   useFrame(({ camera }) => {
     if (globeRef.current) {
       if (autoRotate) {
-        globeRef.current.rotation.y += 0.002;
+        globeRef.current.rotation.y += rotationSpeed;
       }
       // Обновляем rotation и позицию камеры для фильтрации точек
       setRotation(globeRef.current.rotation.clone());
@@ -412,6 +414,7 @@ export default function GlobeCanvas({
   interactiveEffect = false,
   effectStrength = 1,
   returnSpeed = 0.92,
+  rotationSpeed = 0.002,
 }: {
   showBackHemisphere?: boolean;
   autoRotate?: boolean;
@@ -420,6 +423,7 @@ export default function GlobeCanvas({
   interactiveEffect?: boolean;
   effectStrength?: number;
   returnSpeed?: number;
+  rotationSpeed?: number;
 }) {
   const [mounted, setMounted] = useState(false);
 
@@ -469,6 +473,7 @@ export default function GlobeCanvas({
           interactiveEffect={interactiveEffect}
           effectStrength={effectStrength}
           returnSpeed={returnSpeed}
+          rotationSpeed={rotationSpeed}
         />
       </Canvas>
     </div>

@@ -23,6 +23,7 @@ export default function Home() {
   const [interactiveEffect, setInteractiveEffect] = useState<boolean>(true);
   const [effectStrength, setEffectStrength] = useState<number>(1);
   const [returnSpeed, setReturnSpeed] = useState<number>(0.92); // 0.7-0.99, ближе к 1 = медленнее
+  const [rotationSpeed, setRotationSpeed] = useState<number>(0.002); // 0-0.01
 
   // Функция сброса к дефолтным значениям
   const resetToDefaults = () => {
@@ -33,6 +34,7 @@ export default function Home() {
     setInteractiveEffect(true);
     setEffectStrength(1);
     setReturnSpeed(0.92);
+    setRotationSpeed(0.002);
   };
 
   return (
@@ -47,6 +49,7 @@ export default function Home() {
           interactiveEffect={interactiveEffect}
           effectStrength={effectStrength}
           returnSpeed={returnSpeed}
+          rotationSpeed={rotationSpeed}
         />
       </div>
 
@@ -127,6 +130,35 @@ export default function Home() {
                   </Label>
                 </div>
               </RadioGroup>
+
+              {/* Слайдер скорости вращения */}
+              {autoRotate && (
+                <div className="pt-2 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm text-muted-foreground">
+                      Скорость вращения
+                    </Label>
+                    <span className="text-sm font-medium">
+                      {(rotationSpeed * 500).toFixed(0)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="0.01"
+                    step="0.0001"
+                    value={rotationSpeed}
+                    onChange={(e) =>
+                      setRotationSpeed(parseFloat(e.target.value))
+                    }
+                    className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>медленнее</span>
+                    <span>быстрее</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Цвет фона сцены */}
