@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState } from "react";
+import { useRef, useMemo, useEffect, useState, ReactElement } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Stats } from "@react-three/drei";
 import * as THREE from "three";
@@ -565,7 +565,7 @@ function Globe3D({
               blendFunction={BlendFunction.OVERLAY}
             />
           ),
-        ].filter((effect): effect is JSX.Element => Boolean(effect));
+        ].filter((effect): effect is ReactElement => Boolean(effect));
 
         return effects.length > 0 ? (
           <EffectComposer multisampling={0}>{effects}</EffectComposer>
