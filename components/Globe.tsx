@@ -565,7 +565,7 @@ function Globe3D({
               blendFunction={BlendFunction.OVERLAY}
             />
           ),
-        ].filter(Boolean);
+        ].filter((effect): effect is JSX.Element => Boolean(effect));
 
         return effects.length > 0 ? (
           <EffectComposer multisampling={0}>{effects}</EffectComposer>
