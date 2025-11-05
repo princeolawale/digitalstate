@@ -530,37 +530,39 @@ function Globe3D({
       {showStats && <Stats />}
 
       {/* VFX Пост-обработка */}
-      <EffectComposer multisampling={0} enabled={bloomEnabled || chromaticAberrationEnabled || depthOfFieldEnabled || filmGrainEnabled}>
-        {bloomEnabled ? (
-          <Bloom
-            intensity={bloomIntensity}
-            luminanceThreshold={0.2}
-            luminanceSmoothing={0.9}
-            radius={bloomRadius}
-            mipmapBlur
-          />
-        ) : null}
-        {chromaticAberrationEnabled ? (
-          <ChromaticAberration
-            offset={new THREE.Vector2(chromaticAberrationOffset, chromaticAberrationOffset)}
-            blendFunction={BlendFunction.NORMAL}
-          />
-        ) : null}
-        {depthOfFieldEnabled ? (
-          <DepthOfField
-            focusDistance={depthOfFieldFocusDistance}
-            focalLength={depthOfFieldFocalLength}
-            bokehScale={2}
-            height={480}
-          />
-        ) : null}
-        {filmGrainEnabled ? (
-          <Noise
-            opacity={filmGrainIntensity}
-            blendFunction={BlendFunction.OVERLAY}
-          />
-        ) : null}
-      </EffectComposer>
+      {(bloomEnabled || chromaticAberrationEnabled || depthOfFieldEnabled || filmGrainEnabled) && (
+        <EffectComposer multisampling={0}>
+          {bloomEnabled && (
+            <Bloom
+              intensity={bloomIntensity}
+              luminanceThreshold={0.2}
+              luminanceSmoothing={0.9}
+              radius={bloomRadius}
+              mipmapBlur
+            />
+          )}
+          {chromaticAberrationEnabled && (
+            <ChromaticAberration
+              offset={new THREE.Vector2(chromaticAberrationOffset, chromaticAberrationOffset)}
+              blendFunction={BlendFunction.NORMAL}
+            />
+          )}
+          {depthOfFieldEnabled && (
+            <DepthOfField
+              focusDistance={depthOfFieldFocusDistance}
+              focalLength={depthOfFieldFocalLength}
+              bokehScale={2}
+              height={480}
+            />
+          )}
+          {filmGrainEnabled && (
+            <Noise
+              opacity={filmGrainIntensity}
+              blendFunction={BlendFunction.OVERLAY}
+            />
+          )}
+        </EffectComposer>
+      )}
     </>
   );
 }
