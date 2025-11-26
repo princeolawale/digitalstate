@@ -1,41 +1,29 @@
-import { SettingsProps } from "@/types/settings";
-import { HemisphereVisibility } from "./sections/HemisphereVisibility";
-import { AutoRotation } from "./sections/AutoRotation";
-import { BackgroundColor } from "./sections/BackgroundColor";
-import { InteractiveEffect } from "./sections/InteractiveEffect";
-import { PerformanceStats } from "./sections/PerformanceStats";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useGlobeSettings } from "@/contexts/GlobeSettingsContext";
+import {
+  HemisphereVisibility,
+  AutoRotation,
+  InteractiveEffect,
+  PerformanceStats,
+  LayersVisibility,
+  MaterialSettings,
+  VFXSettings,
+} from "./sections";
 
-export function SettingsContent({
-  showBackHemisphere,
-  setShowBackHemisphere,
-  autoRotate,
-  setAutoRotate,
-  rotationSpeed,
-  setRotationSpeed,
-  backgroundColor,
-  setBackgroundColor,
-  interactiveEffect,
-  setInteractiveEffect,
-  effectStrength,
-  setEffectStrength,
-  returnSpeed,
-  setReturnSpeed,
-  showStats,
-  setShowStats,
-  resetToDefaults,
-}: SettingsProps) {
+export function SettingsContent() {
+  const settings = useGlobeSettings();
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-6 space-y-6">
       {/* Заголовок */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Sexy Globy ;)</h2>
+          <h2 className="text-lg font-semibold">FUI Globe</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Управление отображением глобуса
           </p>
         </div>
         <button
-          onClick={resetToDefaults}
+          onClick={settings.resetToDefaults}
           className="px-3 py-1.5 text-xs font-medium rounded-md border border-border hover:bg-accent hover:text-accent-foreground transition-colors"
           title="Сбросить все настройки к дефолтным значениям"
         >
@@ -43,35 +31,33 @@ export function SettingsContent({
         </button>
       </div>
 
-      {/* Секции настроек */}
-      <HemisphereVisibility
-        showBackHemisphere={showBackHemisphere}
-        setShowBackHemisphere={setShowBackHemisphere}
-      />
+      {/* Вкладки */}
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="general">Общие</TabsTrigger>
+          <TabsTrigger value="materials">Материалы</TabsTrigger>
+          <TabsTrigger value="vfx">VFX</TabsTrigger>
+        </TabsList>
 
-      <AutoRotation
-        autoRotate={autoRotate}
-        setAutoRotate={setAutoRotate}
-        rotationSpeed={rotationSpeed}
-        setRotationSpeed={setRotationSpeed}
-      />
+        {/* Вкладка: Общие настройки */}
+        <TabsContent value="general" className="space-y-6 mt-4">
+          <LayersVisibility {...settings} />
+          <HemisphereVisibility {...settings} />
+          <AutoRotation {...settings} />
+          <InteractiveEffect {...settings} />
+          <PerformanceStats {...settings} />
+        </TabsContent>
 
-      <BackgroundColor
-        backgroundColor={backgroundColor}
-        setBackgroundColor={setBackgroundColor}
-      />
+        {/* Вкладка: Настройки материалов */}
+        <TabsContent value="materials" className="space-y-6 mt-4">
+          <MaterialSettings {...settings} />
+        </TabsContent>
 
-      <InteractiveEffect
-        interactiveEffect={interactiveEffect}
-        setInteractiveEffect={setInteractiveEffect}
-        effectStrength={effectStrength}
-        setEffectStrength={setEffectStrength}
-        returnSpeed={returnSpeed}
-        setReturnSpeed={setReturnSpeed}
-      />
-
-      <PerformanceStats showStats={showStats} setShowStats={setShowStats} />
+        {/* Вкладка: VFX эффекты */}
+        <TabsContent value="vfx" className="space-y-6 mt-4">
+          <VFXSettings {...settings} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
-
