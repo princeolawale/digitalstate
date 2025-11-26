@@ -1,0 +1,30 @@
+{
+  "name": "Interactive 3D Earth Globe - WebGL Three.js FUI HUD",
+  "short_name": "3D Earth Globe",
+  "description": "Interactive 3D Earth planet visualization built with WebGL, Three.js, and React Three Fiber. A futuristic FUI and HUD style 3D globe sandbox.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["multimedia", "entertainment", "education"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "screenshots": [
+    {
+      "src": "/docs/vids/preview.png",
+      "sizes": "1200x675",
+      "type": "image/png",
+      "label": "Interactive 3D Earth Globe Visualization"
+    }
+  ]
+}
+

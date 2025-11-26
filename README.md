@@ -8,6 +8,12 @@
 ![R3F](https://img.shields.io/badge/R3F-8.17-red?style=flat&logo=react)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=flat&logo=tailwind-css&logoColor=white)
 
+## 🔗 Live Demo: Quick Links
+
+🌐 **[Live Demo](https://webgl-digital-globe.vercel.app)** | 🎬 **[FUI Globe Video](docs/vids/fui-globe.mp4)** | 🎬 **[WebGL Globe Video](docs/vids/wegl-globe.mp4)**
+
+---
+
 Interactive 3D Earth planet visualization built with WebGL, Three.js, and React Three Fiber. A futuristic FUI (Futuristic User Interface) and HUD (Heads-Up Display) style 3D globe sandbox demonstrating sci-fi interface design patterns.
 
 ## Interactive 3D Earth Visualization Project
@@ -30,7 +36,7 @@ Perfect for developers exploring **Three.js**, **WebGL**, **3D visualization**, 
 
 ### FUI Globe
 
-<img src="docs/vids/preview.png" width="600" alt="webgl eath sphere planet, FUI, HUD, technoui style">
+[<img src="docs/vids/preview.png" width="600" alt="webgl eath sphere planet, FUI, HUD, technoui style">](https://webgl-digital-globe.vercel.app)
 
 Interactive 3D WebGL visualization of the Earth in a futuristic digital interface style (HUD, FUI)
 
