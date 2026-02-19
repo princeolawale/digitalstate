@@ -181,6 +181,9 @@ body > div[style*="position: fixed"] canvas {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Hide Next.js dev overlay */
+nextjs-portal { display: none !important; }
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

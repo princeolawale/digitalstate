@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DIGITAL STATE — Command</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#b8963e;--gold2:#d4ae5a;--gold3:#f0cc80;
+  --red:#c0392b;--red2:#e74c3c;
+  --green:#1a7a4a;--green2:#27ae60;
+  --blue:#1a4a7a;--blue2:#2980b9;
+  --purple2:#9b59b6;
+  --bg:#04060c;--bg2:#070a12;
+  --card:rgba(7,10,18,0.98);
+  --border:rgba(184,150,62,0.2);--border2:rgba(184,150,62,0.08);--border3:rgba(255,255,255,0.05);
+  --text:#c4beb0;--text2:#5e5a52;--text3:#8a8478;
+  --panel-w:360px;
+  --ff:'Cinzel',serif;--ff-mono:'Share Tech Mono',monospace;--ff-body:'Rajdhani',sans-serif;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--ff-body);-webkit-font-smoothing:antialiased}
+.scanlines{pointer-events:none;position:fixed;inset:0;z-index:998;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px)}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;z-index:10;display:none;overflow:hidden}
+.screen.active{display:flex}
+
+/* ═══ CREATION SCREEN ═══ */
+#s-create{background:var(--bg);flex-direction:row;align-items:stretch}
+.cr-left{width:380px;flex-shrink:0;border-right:1px solid var(--border2);display:flex;flex-direction:column}
+.cr-right{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.cr-hdr{padding:28px 28px 20px;border-bottom:1px solid var(--border2)}
+.cr-hdr .step{font-family:var(--ff-mono);font-size:9px;letter-spacing:3px;color:var(--gold);margin-bottom:8px}
+.cr-hdr h2{font-family:var(--ff);font-size:24px;font-weight:700;color:#fff;letter-spacing:1px}
+.cr-preview{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(184,150,62,0.04) 0%,transparent 70%)}
+.avatar-ring{width:120px;height:120px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;background:radial-gradient(circle at 38% 32%,rgba(184,150,62,0.1) 0%,transparent 65%)}
+.avatar-ring::before{content:'';position:absolute;inset:-7px;border-radius:50%;border:1px solid var(--border2)}
+.avatar-ring::after{content:'';position:absolute;inset:-14px;border-radius:50%;border:1px solid var(--border2);opacity:0.35}
+.prev-name{font-family:var(--ff);font-size:18px;font-weight:700;color:#fff;letter-spacing:1px;text-align:center}
+.prev-nation{font-family:var(--ff-mono);font-size:10px;letter-spacing:3px;color:var(--gold);text-align:center}
+.prev-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.prev-tag{font-family:var(--ff-mono);font-size:9px;letter-spacing:1px;padding:3px 8px;border:1px solid var(--border);color:var(--gold2)}
+.cr-foot{padding:20px 28px;border-top:1px solid var(--border2);display:flex;justify-content:space-between}
+.csec{padding:24px 28px;border-bottom:1px solid var(--border2)}
+.csec:last-child{border-bottom:none}
+.csec-title{font-family:var(--ff-mono);font-size:9px;letter-spacing:3px;color:var(--gold);margin-bottom:16px;text-transform:uppercase}
+.finput{width:100%;padding:11px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--border2);color:var(--text);font-family:var(--ff-body);font-size:15px;font-weight:500;outline:none;transition:border-color 0.15s;margin-bottom:10px}
+.finput:focus{border-color:var(--border)}
+.finput::placeholder{color:var(--text2);font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pick-card{padding:12px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border3);cursor:pointer;text-align:center;transition:all 0.15s;position:relative}
+.pick-card:hover{border-color:var(--border2);background:rgba(184,150,62,0.04)}
+.pick-card.sel{border-color:var(--gold);background:rgba(184,150,62,0.08)}
+.pick-card.sel::after{content:'✓';position:absolute;top:6px;right:6px;font-size:9px;color:var(--gold)}
+.pick-icon{font-size:18px;margin-bottom:5px}
+.pick-name{font-size:12px;font-weight:600;color:var(--text)}
+.pick-sub{font-family:var(--ff-mono);font-size:9px;color:var(--text2);letter-spacing:0.5px;margin-top:2px}
+.sl-row{margin-bottom:14px}
+.sl-hd{display:flex;justify-content:space-between;margin-bottom:6px}
+.sl-hd span{font-family:var(--ff-mono);font-size:9px;letter-spacing:1px;color:var(--text2)}
+.sl{width:100%;-webkit-appearance:none;height:2px;background:var(--border2);outline:none;cursor:pointer}
+.sl::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--gold);border:none;border-radius:0}
+.btn-gold{padding:12px 32px;font-family:var(--ff);font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;cursor:pointer;background:var(--gold);border:none;color:var(--bg);transition:background 0.15s}
+.btn-gold:hover{background:var(--gold2)}
+.btn-ghost{padding:12px 24px;font-family:var(--ff-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text2);transition:all 0.15s}
+.btn-ghost:hover{color:var(--text);border-color:var(--text3)}
+
+/* ═══ GAME SCREEN ═══ */
+#s-game{background:var(--bg);flex-direction:row}
+
+/* Globe area — fills left of panel */
+#globe-area{
+  position:relative;flex:1;
+  transition:margin-right 0.4s cubic-bezier(0.32,0.72,0,1);
+  margin-right:var(--panel-w);
+  min-width:0;overflow:hidden;
+}
+#globe-area.panel-closed{margin-right:0}
+
+/* IFRAME — 100% width, globe.html is standalone */
+#globe-iframe{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  border:none;
+}
+
+/* HUD */
+#hud{position:absolute;top:0;left:0;right:0;height:54px;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:linear-gradient(180deg,rgba(4,6,12,0.96) 0%,transparent 100%);border-bottom:1px solid var(--border2);pointer-events:none}
+.hud-left{display:flex;align-items:center;gap:16px;pointer-events:auto}
+.hud-logo{font-family:var(--ff);font-size:14px;font-weight:700;letter-spacing:4px;color:var(--gold2)}
+.hud-sep{width:1px;height:18px;background:var(--border2)}
+.hud-user{font-family:var(--ff-mono);font-size:10px;letter-spacing:2px;color:var(--text2)}
+.hud-stats{display:flex;pointer-events:auto}
+.hstat{display:flex;flex-direction:column;align-items:flex-end;padding:0 14px;border-left:1px solid var(--border2)}
+.hstat-l{font-family:var(--ff-mono);font-size:8px;letter-spacing:2px;color:var(--text2);margin-bottom:1px}
+.hstat-v{font-family:var(--ff-mono);font-size:17px;color:var(--gold2);line-height:1}
+
+/* Epoch — top-center, above layer buttons */
+#epoch-hud{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:20;padding:5px 0;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
+.ep-lbl{font-family:var(--ff-mono);font-size:7px;letter-spacing:3px;color:var(--text2)}
+.ep-track{width:120px;height:1px;background:var(--border2);overflow:hidden}
+.ep-fill{height:100%;background:var(--gold);transition:width 1s linear}
+.ep-name{font-family:var(--ff-mono);font-size:8px;color:var(--gold);letter-spacing:2px}
+
+/* LAYER BUTTONS — left side, vertical */
+#layer-indicator{
+  position:absolute;left:0;top:50%;transform:translateY(-50%);
+  z-index:25;display:flex;flex-direction:column;pointer-events:auto;
+}
+.layer-btn{
+  padding:12px 10px;
+  font-family:var(--ff-mono);font-size:7px;letter-spacing:1.5px;
+  text-transform:uppercase;
+  background:rgba(4,6,12,0.9);
+  border:1px solid var(--border2);border-left:none;border-bottom:none;
+  color:var(--text2);cursor:pointer;transition:all 0.15s;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  height:80px;display:flex;align-items:center;justify-content:center;
+}
+.layer-btn:last-child{border-bottom:1px solid var(--border2)}
+.layer-btn:hover{color:var(--text);border-color:var(--border);background:rgba(184,150,62,0.06)}
+.layer-btn.active{color:var(--gold2);border-color:var(--gold);background:rgba(184,150,62,0.1)}
+
+/* Event feed */
+#evt-feed{position:absolute;bottom:20px;left:60px;z-index:20;width:260px;display:flex;flex-direction:column;gap:4px;pointer-events:none}
+.evt{padding:7px 10px;background:rgba(4,6,12,0.93);border-left:2px solid var(--gold);font-family:var(--ff-mono);font-size:10px;color:var(--text3);line-height:1.5;animation:evtIn 0.2s ease}
+.evt.red{border-left-color:var(--red2)}.evt.green{border-left-color:var(--green2)}.evt.blue{border-left-color:var(--blue2)}
+.evt-t{color:var(--text2);font-size:8px;display:block;margin-bottom:1px}
+@keyframes evtIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+
+/* LAYER OVERLAYS */
+.layer-overlay{position:absolute;inset:0;z-index:15;display:none;pointer-events:none}
+.layer-overlay.visible{display:block;pointer-events:auto}
+
+/* Layer 2 — Country */
+#layer-country{background:rgba(4,6,12,0.93);display:flex;align-items:center;justify-content:center}
+.country-map{width:min(680px,85vw);aspect-ratio:16/9;position:relative;border:1px solid var(--border);background:rgba(10,20,35,0.95);overflow:hidden}
+.cmap-title{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-family:var(--ff);font-size:12px;font-weight:700;letter-spacing:3px;color:var(--gold2);text-transform:uppercase;white-space:nowrap}
+.cmap-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(184,150,62,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(184,150,62,0.04) 1px,transparent 1px);background-size:40px 40px}
+.cmap-region{position:absolute;border:1px solid rgba(184,150,62,0.12);display:flex;align-items:center;justify-content:center;font-family:var(--ff-mono);font-size:8px;letter-spacing:1px;cursor:pointer;transition:all 0.2s}
+.cmap-region:hover{background:rgba(184,150,62,0.15)!important;border-color:var(--gold)}
+.cmap-region .rlbl{color:var(--text2);text-align:center;line-height:1.5;pointer-events:none}
+.cmap-stats{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:20px}
+.cmap-s{text-align:center}
+.cmap-sv{font-family:var(--ff-mono);font-size:15px;color:var(--gold2)}
+.cmap-sl{font-family:var(--ff-mono);font-size:7px;color:var(--text2);letter-spacing:1px}
+.hap-dots{position:absolute;bottom:52px;left:12px;right:12px;display:flex;gap:3px;flex-wrap:wrap}
+.hap-dot{width:5px;height:5px;border-radius:50%}
+
+/* Layer 3 — Government */
+#layer-gov{background:rgba(2,4,10,0.96);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:24px}
+.gov-room{width:100%;max-width:860px;position:relative}
+.gov-table-wrap{width:100%;height:140px;position:relative;margin-bottom:8px;background:radial-gradient(ellipse 60% 50% at 50% 100%,rgba(184,150,62,0.05) 0%,transparent 70%)}
+.gov-table-svg{position:absolute;bottom:0;left:50%;transform:translateX(-50%);opacity:0.2}
+.gov-agents{display:flex;justify-content:center;gap:clamp(6px,2vw,28px);align-items:flex-end;padding:0 16px}
+.gov-agent{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:transform 0.2s;position:relative}
+.gov-agent:hover{transform:translateY(-4px)}
+.gov-agent.speaking .gov-ava-wrap{box-shadow:0 0 0 2px var(--gold),0 0 18px rgba(184,150,62,0.25)}
+.gov-ava-wrap{width:58px;height:64px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(184,150,62,0.07) 0%,rgba(4,6,12,0.8) 100%);display:flex;align-items:center;justify-content:center;font-size:26px;position:relative;transition:box-shadow 0.3s}
+.gov-lbar{position:absolute;bottom:0;left:0;right:0;height:2px}
+.gov-aname{font-family:var(--ff-mono);font-size:7px;letter-spacing:1px;color:var(--text2);text-align:center;max-width:65px}
+.speech-bub{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(6,10,18,0.98);border:1px solid var(--border);padding:6px 9px;min-width:140px;max-width:200px;font-family:var(--ff-mono);font-size:8px;color:var(--text);line-height:1.5;text-align:center;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:10;white-space:normal}
+.speech-bub.show{opacity:1}
+.speech-bub::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--border)}
+#gov-chat{width:min(560px,88vw);margin-top:10px;display:flex;flex-direction:column;gap:3px;max-height:90px;overflow:hidden}
+.gov-msg{font-family:var(--ff-mono);font-size:9px;color:var(--text3);line-height:1.5;text-align:center;opacity:0;transition:opacity 0.3s}
+.gov-msg.show{opacity:1}
+.gov-msg strong{color:var(--gold2)}
+
+/* PANEL TOGGLE */
+#ptoggle{position:fixed;top:50%;z-index:300;width:18px;height:48px;background:rgba(4,6,12,0.96);border:1px solid var(--border);border-right:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);padding:0;transition:right 0.4s cubic-bezier(0.32,0.72,0,1),color 0.15s,background 0.15s;transform:translateY(-50%);right:var(--panel-w)}
+#ptoggle:hover{background:rgba(184,150,62,0.08);color:var(--gold)}
+#ptoggle svg{transition:transform 0.35s ease;flex-shrink:0}
+#ptoggle.closed{right:0}
+#ptoggle.closed svg{transform:rotate(180deg)}
+
+/* SIDE PANEL */
+#panel{position:fixed;top:0;right:0;width:var(--panel-w);height:100%;background:rgba(4,6,12,0.99);border-left:1px solid var(--border2);z-index:250;display:flex;flex-direction:column;transform:translateX(0);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1)}
+#panel.closed{transform:translateX(100%)}
+#pscroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+#pscroll::-webkit-scrollbar{width:2px}
+#pscroll::-webkit-scrollbar-thumb{background:var(--border)}
+.ptabs{display:flex;border-bottom:1px solid var(--border2);flex-shrink:0}
+.ptab{flex:1;padding:11px 4px;font-family:var(--ff-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text2);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;transition:color 0.15s,border-color 0.15s;position:relative;bottom:-1px}
+.ptab:hover{color:var(--text)}
+.ptab.on{color:var(--gold2);border-bottom-color:var(--gold)}
+.tabp{display:none;padding:14px}
+.tabp.on{display:block}
+.psec-title{font-family:var(--ff-mono);font-size:8px;letter-spacing:3px;color:var(--text2);text-transform:uppercase;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border2)}
+
+/* Country box */
+.cbox{background:rgba(255,255,255,0.02);border:1px solid var(--border2);padding:12px;margin-bottom:12px;display:none}
+.cbox.on{display:block}
+.cbox-name{font-family:var(--ff);font-size:16px;color:var(--gold2);margin-bottom:3px}
+.cbox-meta{font-family:var(--ff-mono);font-size:8px;color:var(--text2);letter-spacing:2px;margin-bottom:10px}
+
+/* Action buttons */
+.abtn{width:100%;margin-bottom:5px;padding:9px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border3);display:flex;align-items:center;gap:9px;color:var(--text);font-family:var(--ff-body);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;text-align:left}
+.abtn:hover{background:rgba(184,150,62,0.06);border-color:var(--border);color:var(--gold2)}
+.abtn:active{transform:scale(0.99)}
+.ai{font-size:13px;width:16px;text-align:center;flex-shrink:0}
+.ac{margin-left:auto;font-family:var(--ff-mono);font-size:8px;color:var(--text2);letter-spacing:1px}
+
+/* Influence bars */
+.ibar-row{display:grid;grid-template-columns:70px 1fr 28px;align-items:center;gap:7px;margin-bottom:8px}
+.ibar-lbl{font-family:var(--ff-mono);font-size:8px;letter-spacing:1px;color:var(--text2)}
+.ibar-track{height:3px;background:var(--border2);overflow:hidden}
+.ibar-fill{height:100%;transition:width 0.6s ease}
+.ibar-pct{font-family:var(--ff-mono);font-size:8px;color:var(--text3);text-align:right}
+
+/* Agent cards */
+.agent-card{background:rgba(255,255,255,0.02);border:1px solid var(--border3);padding:11px;margin-bottom:7px;cursor:pointer;transition:all 0.15s;position:relative}
+.agent-card:hover{border-color:var(--border2)}
+.ac-stripe{position:absolute;left:0;top:0;bottom:0;width:2px}
+.ac-top{display:flex;gap:9px;margin-bottom:7px;align-items:flex-start}
+.ac-ava{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,0.04);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:14px}
+.ac-name{font-size:13px;font-weight:700;color:var(--text)}
+.ac-role{font-family:var(--ff-mono);font-size:8px;color:var(--text2);letter-spacing:1px;margin-top:1px}
+.ac-badge{display:inline-block;margin-top:3px;padding:1px 5px;font-family:var(--ff-mono);font-size:7px;letter-spacing:1px;border:1px solid}
+.bl{color:var(--green2);border-color:rgba(39,174,96,0.3);background:rgba(39,174,96,0.06)}
+.bn{color:var(--gold2);border-color:var(--border);background:rgba(184,150,62,0.06)}
+.bs{color:var(--red2);border-color:rgba(231,76,60,0.3);background:rgba(231,76,60,0.06)}
+.bm{color:var(--blue2);border-color:rgba(41,128,185,0.3);background:rgba(41,128,185,0.06)}
+.ac-thought{font-family:var(--ff-mono);font-size:9px;color:var(--text2);line-height:1.5;border-top:1px solid var(--border2);padding-top:7px;letter-spacing:0.3px}
+.ac-thought::before{content:'"';color:var(--gold)}
+.ac-thought::after{content:'"';color:var(--gold)}
+.ac-mission{margin-top:5px;padding:4px 7px;font-family:var(--ff-mono);font-size:8px;letter-spacing:1px;background:rgba(41,128,185,0.1);border:1px solid rgba(41,128,185,0.2);color:var(--blue2)}
+
+/* Hierarchy */
+.hier-president{text-align:center;padding:14px;background:rgba(184,150,62,0.07);border:1px solid var(--border);margin-bottom:12px;position:relative}
+.hier-president::after{content:'';position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);width:1px;height:12px;background:var(--border)}
+.hier-pname{font-family:var(--ff);font-size:13px;color:var(--gold2);font-weight:700;letter-spacing:1px}
+.hier-prole{font-family:var(--ff-mono);font-size:8px;color:var(--text2);letter-spacing:2px;margin-top:2px}
+.hier-row{display:flex;gap:6px;margin-bottom:6px}
+.hier-row-label{font-family:var(--ff-mono);font-size:7px;letter-spacing:2px;color:var(--text2);writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;padding:0 3px}
+.hier-cards{flex:1;display:flex;flex-direction:column;gap:4px}
+.hcard{padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border3);display:flex;align-items:center;gap:8px;cursor:pointer;transition:all 0.15s}
+.hcard:hover{border-color:var(--border2)}
+.hcard-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.hcard-info{flex:1}
+.hcard-name{font-size:11px;font-weight:600;color:var(--text)}
+.hcard-role{font-family:var(--ff-mono);font-size:7px;color:var(--text2);letter-spacing:1px}
+.hcard-status{font-family:var(--ff-mono);font-size:7px;padding:1px 5px;border:1px solid;margin-left:auto}
+.hier-conn{margin-left:24px;margin-bottom:6px;border-left:1px dashed var(--border2);border-bottom:1px dashed var(--border2);height:6px;width:16px}
+
+/* Multiplayer */
+.mp-player{padding:9px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border3);margin-bottom:5px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all 0.15s}
+.mp-player:hover{border-color:var(--border2)}
+.mp-dot{width:7px;height:7px;border-radius:50%;background:var(--green2);flex-shrink:0}
+.mp-dot.away{background:var(--gold)}.mp-dot.offline{background:var(--text2)}
+.mp-name{font-family:var(--ff-mono);font-size:10px;color:var(--text);letter-spacing:1px;flex:1}
+.mp-nation{font-family:var(--ff-mono);font-size:8px;color:var(--text2)}
+.mp-action{font-family:var(--ff-mono);font-size:7px;padding:2px 6px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all 0.15s;background:none}
+.mp-action:hover{border-color:var(--gold);color:var(--gold)}
+.mp-action.ally{border-color:rgba(39,174,96,0.3);color:var(--green2)}
+.mp-action.war{border-color:rgba(231,76,60,0.3);color:var(--red2)}
+
+/* Agent modal */
+#agent-modal,#mission-modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(4,6,12,0.88)}
+#agent-modal.on,#mission-modal.on{display:flex}
+.amodal-box{width:480px;background:rgba(6,9,16,0.99);border:1px solid var(--border);display:flex;flex-direction:column;max-height:90vh}
+.mmodal-box{width:440px;background:rgba(6,9,16,0.99);border:1px solid var(--border)}
+.amodal-hdr,.mmodal-hdr{padding:16px 20px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center}
+.amodal-hdr h3,.mmodal-hdr h3{font-family:var(--ff);font-size:15px;color:var(--gold2);font-weight:700;letter-spacing:1px}
+.amodal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:4px}
+.amodal-body,.mmodal-body{flex:1;overflow-y:auto;padding:20px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.amodal-foot{padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:8px}
+.country-select{width:100%;padding:9px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border2);color:var(--text);font-family:var(--ff-mono);font-size:11px;outline:none;cursor:pointer;margin-bottom:12px}
+.country-select option{background:var(--bg)}
+.mission-type{padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border3);margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.15s}
+.mission-type:hover,.mission-type.sel{border-color:var(--border);background:rgba(184,150,62,0.06)}
+.mt-icon{font-size:15px;width:20px;text-align:center}
+.mt-name{font-size:13px;font-weight:600;color:var(--text)}
+.mt-desc{font-family:var(--ff-mono);font-size:9px;color:var(--text2);margin-top:1px}
+.mt-risk{margin-left:auto;font-family:var(--ff-mono);font-size:8px;padding:2px 6px;border:1px solid}
+.risk-low{color:var(--green2);border-color:rgba(39,174,96,0.3)}
+.risk-med{color:var(--gold2);border-color:var(--border)}
+.risk-high{color:var(--red2);border-color:rgba(231,76,60,0.3)}
+
+/* Crisis bar */
+#crisis-bar{position:fixed;top:0;left:0;right:0;z-index:400;padding:11px 24px;background:rgba(192,57,43,0.94);border-bottom:1px solid rgba(231,76,60,0.4);display:flex;align-items:center;justify-content:center;gap:16px;transform:translateY(-100%);transition:transform 0.35s ease}
+#crisis-bar.on{transform:translateY(0)}
+.crisis-text{font-family:var(--ff-mono);font-size:11px;letter-spacing:2px;color:#fff}
+.crisis-btn{padding:5px 16px;font-family:var(--ff-mono);font-size:9px;letter-spacing:2px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;cursor:pointer}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;right:380px;z-index:300;background:rgba(4,6,12,0.97);border:1px solid var(--border);padding:10px 16px;font-family:var(--ff-mono);font-size:10px;color:var(--text);letter-spacing:1px;transition:right 0.4s cubic-bezier(0.32,0.72,0,1),opacity 0.3s;opacity:0}
+#toast.show{opacity:1}
+#toast.closed{right:20px}
+
+hr.line{border:none;border-top:1px solid var(--border2);margin:12px 0}
+
+/* ═══ CHRONICLE SCREEN ═══ */
+#s-chronicle{background:var(--bg);z-index:300;flex-direction:column;overflow:hidden}
+.chr-hdr{padding:24px 40px 18px;border-bottom:1px solid var(--border2);flex-shrink:0;display:flex;align-items:flex-end;justify-content:space-between}
+.chr-hdr h1{font-family:var(--ff);font-size:26px;font-weight:700;color:#fff;letter-spacing:2px}
+.chr-sub{font-family:var(--ff-mono);font-size:9px;letter-spacing:3px;color:var(--gold);margin-bottom:8px}
+.chr-body{flex:1;overflow-y:auto;padding:32px 40px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.chr-entry{border-left:2px solid var(--border);padding:0 0 30px 24px;position:relative}
+.chr-entry::before{content:'';position:absolute;left:-5px;top:2px;width:8px;height:8px;border-radius:50%;background:var(--gold);border:2px solid var(--bg)}
+.chr-entry.red::before{background:var(--red2)}
+.chr-entry.green::before{background:var(--green2)}
+.chr-epoch{font-family:var(--ff-mono);font-size:9px;letter-spacing:3px;color:var(--gold);margin-bottom:6px}
+.chr-headline{font-family:var(--ff);font-size:17px;font-weight:700;color:#fff;letter-spacing:1px;margin-bottom:8px}
+.chr-text{font-family:var(--ff-mono);font-size:10px;color:var(--text3);line-height:1.9;letter-spacing:0.3px}
+.chr-quote{margin:12px 0;padding:9px 14px;border-left:2px solid var(--gold);font-family:var(--ff-mono);font-size:9px;color:var(--text2);font-style:italic}
+.chr-footer{padding:18px 40px;border-top:1px solid var(--border2);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}
+.chr-stat-row{display:flex;gap:28px}
+.chr-stat-v{font-family:var(--ff-mono);font-size:20px;color:var(--gold2);text-align:center}
+.chr-stat-l{font-family:var(--ff-mono);font-size:8px;letter-spacing:2px;color:var(--text2);text-align:center}
+
+/* ═══ CINEMATIC CRISIS ═══ */
+#s-cinematic{background:#000;z-index:350;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.cin-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(192,57,43,0.07) 0%,transparent 70%);animation:cinPulse 3s ease-in-out infinite}
+@keyframes cinPulse{0%,100%{opacity:0.4}50%{opacity:1}}
+.cin-scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px)}
+.cin-content{position:relative;z-index:1;text-align:center;max-width:680px;padding:0 40px}
+.cin-label{font-family:var(--ff-mono);font-size:10px;letter-spacing:6px;color:var(--red2);text-transform:uppercase;margin-bottom:20px;animation:cinFlash 1.2s ease infinite}
+@keyframes cinFlash{0%,100%{opacity:1}50%{opacity:0.2}}
+.cin-title{font-family:var(--ff);font-size:clamp(28px,5vw,64px);font-weight:900;color:#fff;letter-spacing:4px;text-transform:uppercase;line-height:1;margin-bottom:10px;animation:cinIn 0.5s cubic-bezier(0.22,0.61,0.36,1) both}
+@keyframes cinIn{from{opacity:0;transform:scale(0.93)}to{opacity:1;transform:none}}
+.cin-sub{font-family:var(--ff);font-size:clamp(13px,2vw,20px);color:var(--red2);letter-spacing:3px;text-transform:uppercase;margin-bottom:28px}
+.cin-report{font-family:var(--ff-mono);font-size:11px;color:var(--text3);line-height:1.9;border:1px solid var(--border2);padding:14px 18px;background:rgba(4,6,12,0.85);text-align:left;margin-bottom:32px}
+.cin-reporter{font-family:var(--ff-mono);font-size:8px;color:var(--gold);letter-spacing:2px;margin-bottom:9px;border-bottom:1px solid var(--border2);padding-bottom:6px}
+.cin-choices{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cin-choice{padding:12px 26px;font-family:var(--ff);font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);color:var(--text);background:rgba(4,6,12,0.8);transition:all 0.15s}
+.cin-choice:hover{border-color:var(--gold2);color:var(--gold2)}
+.cin-choice.primary{background:var(--red2);border-color:var(--red2);color:#fff}
+.cin-choice.primary:hover{background:var(--red)}
+.cin-timer{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-family:var(--ff-mono);font-size:9px;letter-spacing:2px;color:var(--text2)}
+
+/* ═══ VOTE SCREEN ═══ */
+#s-vote{background:rgba(2,3,8,0.98);z-index:300;flex-direction:column;align-items:center;justify-content:center}
+.vote-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 40%,rgba(184,150,62,0.04) 0%,transparent 70%)}
+.vote-title{font-family:var(--ff);font-size:clamp(18px,3vw,34px);font-weight:900;letter-spacing:6px;color:#fff;text-transform:uppercase;margin-bottom:6px;position:relative;z-index:1;animation:fadeUp 0.5s ease both}
+.vote-sub{font-family:var(--ff-mono);font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:36px;position:relative;z-index:1}
+.vote-agents{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;margin-bottom:36px}
+.vote-card{width:100px;display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border3);opacity:0;transform:translateY(16px);transition:opacity 0.4s,transform 0.4s,border-color 0.3s}
+.vote-card.revealed{opacity:1;transform:none}
+.vote-card.for{border-color:var(--green2);background:rgba(39,174,96,0.06)}
+.vote-card.against{border-color:var(--red2);background:rgba(231,76,60,0.06)}
+.vote-ava{font-size:26px}
+.vote-name{font-family:var(--ff-mono);font-size:7px;letter-spacing:1px;color:var(--text2);text-align:center}
+.vote-verdict{font-family:var(--ff);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.vote-card.for .vote-verdict{color:var(--green2)}
+.vote-card.against .vote-verdict{color:var(--red2)}
+.vote-result{position:relative;z-index:1;text-align:center;opacity:0;transition:opacity 0.5s}
+.vote-result.show{opacity:1}
+.vote-result-title{font-family:var(--ff);font-size:clamp(24px,5vw,52px);font-weight:900;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px}
+.vote-result-sub{font-family:var(--ff-mono);font-size:10px;letter-spacing:2px;color:var(--text2)}
+.vote-close{position:relative;z-index:1;margin-top:24px;padding:11px 34px;font-family:var(--ff);font-size:10px;font-weight:600;letter-spacing:4px;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text);transition:all 0.15s;opacity:0}
+.vote-close.show{opacity:1}
+.vote-close:hover{border-color:var(--gold);color:var(--gold2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<div id="crisis-bar"><span class="crisis-text" id="crisis-text">⚡ EPOCH CRISIS</span><button class="crisis-btn" onclick="crisisAct('respond')">RESPOND</button><button class="crisis-btn" onclick="crisisAct('ignore')">IGNORE −100</button></div>
+<div id="toast"></div>
+
+<!-- AGENT MODAL -->
+<div id="agent-modal"><div class="amodal-box">
+  <div class="amodal-hdr"><h3>Recruit Agent</h3><button class="amodal-close" onclick="closeAgentModal()">✕</button></div>
+  <div class="amodal-body">
+    <div class="csec-title" style="font-family:var(--ff-mono);font-size:8px;letter-spacing:3px;color:var(--gold);margin-bottom:12px">IDENTITY</div>
+    <input class="finput" id="a-name" placeholder="Agent name" maxlength="28"/>
+    <div class="grid2" style="margin-bottom:12px"><input class="finput" style="margin-bottom:0" id="a-code" placeholder="Codename"/><input class="finput" style="margin-bottom:0" id="a-age" placeholder="Age" type="number" min="24" max="60"/></div>
+    <div class="csec-title" style="font-family:var(--ff-mono);font-size:8px;letter-spacing:3px;color:var(--gold);margin-bottom:12px;margin-top:16px">SPECIALTY</div>
+    <div class="grid2" id="spec-grid"></div>
+    <div class="csec-title" style="font-family:var(--ff-mono);font-size:8px;letter-spacing:3px;color:var(--gold);margin-bottom:12px;margin-top:16px">AVATAR</div>
+    <div class="grid3" id="a-avatar-grid" style="gap:6px"></div>
+    <div class="csec-title" style="font-family:var(--ff-mono);font-size:8px;letter-spacing:3px;color:var(--gold);margin-bottom:12px;margin-top:16px">BACKGROUND</div>
+    <div id="bg-story" style="font-family:var(--ff-mono);font-size:9px;color:var(--text2);line-height:1.7;padding:10px;background:rgba(255,255,255,0.02);border:1px solid var(--border2)">Select specialty to generate background...</div>
+  </div>
+  <div class="amodal-foot"><button class="btn-ghost" onclick="closeAgentModal()">Cancel</button><button class="btn-gold" onclick="recruitAgent()">Recruit Agent</button></div>
+</div></div>
+
+<!-- MISSION MODAL -->
+<div id="mission-modal"><div class="mmodal-box">
+  <div class="mmodal-hdr"><h3>Assign Mission</h3><button class="amodal-close" onclick="closeMissionModal()">✕</button></div>
+  <div class="mmodal-body">
+    <div class="psec-title" style="margin-bottom:10px">TARGET NATION</div>
+    <select class="country-select" id="mission-target"></select>
+    <div class="psec-title" style="margin-bottom:10px">MISSION TYPE</div>
+    <div id="mission-types"></div>
+  </div>
+  <div style="padding:14px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:8px">
+    <button class="btn-ghost" onclick="closeMissionModal()">Cancel</button>
+    <button class="btn-gold" onclick="confirmMission()">Deploy Agent</button>
+  </div>
+</div></div>
+
+<!-- ════ CREATION SCREEN ════ -->
+<div class="screen active" id="s-create">
+  <div class="cr-left">
+    <div class="cr-hdr"><div class="step">Commander Profile</div><h2>Create Your President</h2></div>
+    <div class="cr-preview">
+      <div class="avatar-ring" id="prev-ava">🤴</div>
+      <div class="prev-name" id="prev-name">Your Name</div>
+      <div class="prev-nation" id="prev-nation">— NO NATION —</div>
+      <div class="prev-tags" id="prev-tags"><span class="prev-tag">Centrist</span><span class="prev-tag">Pragmatist</span><span class="prev-tag">Hawk</span></div>
+    </div>
+    <div class="cr-foot"><button class="btn-ghost" onclick="logout()">← Logout</button><button class="btn-gold" onclick="launchGame()">Enter State →</button></div>
+  </div>
+  <div class="cr-right">
+    <div class="csec"><div class="csec-title">Presidential Identity</div><input class="finput" id="pname" placeholder="President's full name" oninput="document.getElementById('prev-name').textContent=this.value||'Your Name'"/><input class="finput" id="pcode" placeholder='Codename (e.g. "THE ARCHITECT")'/></div>
+    <div class="csec"><div class="csec-title">Choose Your Nation</div><div class="grid2" id="nation-grid"></div></div>
+    <div class="csec"><div class="csec-title">Background · Starting Bonus</div><div class="grid3" id="bg-grid"></div></div>
+    <div class="csec"><div class="csec-title">Core Traits · Max 2</div><div class="grid2" id="trait-grid"></div></div>
+    <div class="csec"><div class="csec-title">Political Spectrum</div>
+      <div class="sl-row"><div class="sl-hd"><span>Liberal</span><span>Conservative</span></div><input type="range" class="sl" id="sl1" min="0" max="100" value="50" oninput="updateTags()"/></div>
+      <div class="sl-row"><div class="sl-hd"><span>Globalist</span><span>Nationalist</span></div><input type="range" class="sl" id="sl2" min="0" max="100" value="40" oninput="updateTags()"/></div>
+      <div class="sl-row"><div class="sl-hd"><span>Diplomat</span><span>Hawk</span></div><input type="range" class="sl" id="sl3" min="0" max="100" value="60" oninput="updateTags()"/></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ GAME SCREEN ════ -->
+<div class="screen" id="s-game">
+  <div id="globe-area">
+    <iframe id="globe-iframe" src="/globe.html" scrolling="no" title="Globe"></iframe>
+
+    <div id="hud">
+      <div class="hud-left">
+        <div class="hud-logo">DIGITAL STATE</div>
+        <div class="hud-sep"></div>
+        <div class="hud-user" id="hud-user">—</div>
+      </div>
+      <div class="hud-stats">
+        <div class="hstat"><div class="hstat-l">INFLUENCE</div><div class="hstat-v" id="st-i">0</div></div>
+        <div class="hstat"><div class="hstat-l">TREASURY</div><div class="hstat-v" id="st-c">1,200</div></div>
+        <div class="hstat"><div class="hstat-l">NATIONS</div><div class="hstat-v" id="st-n">1</div></div>
+        <div class="hstat"><div class="hstat-l">SOFT POWER</div><div class="hstat-v" id="st-s">24</div></div>
+      </div>
+    </div>
+
+    <div id="epoch-hud">
+      <div class="ep-lbl">Epoch Progress</div>
+      <div class="ep-track"><div class="ep-fill" id="ep-fill" style="width:0%"></div></div>
+      <div class="ep-name" id="ep-name">Epoch 1 — Dawn of Power</div>
+    </div>
+
+    <!-- Layer buttons — left side vertical -->
+    <div id="layer-indicator">
+      <button class="layer-btn active" onclick="setLayer(1,this)">🌍 Geopolitics</button>
+      <button class="layer-btn" onclick="setLayer(2,this)">🗺 Country</button>
+      <button class="layer-btn" onclick="setLayer(3,this)">🏛 Government</button>
+    </div>
+
+    <div id="evt-feed"></div>
+
+    <!-- Layer 2: Country view -->
+    <div class="layer-overlay" id="layer-country">
+      <div class="country-map" id="cmap">
+        <div class="cmap-grid"></div>
+        <div class="cmap-title" id="cmap-title">— SELECT A NATION —</div>
+        <div class="hap-dots" id="hap-dots"></div>
+        <div class="cmap-stats">
+          <div class="cmap-s"><div class="cmap-sv" id="cmap-gdp">—</div><div class="cmap-sl">GDP</div></div>
+          <div class="cmap-s"><div class="cmap-sv" id="cmap-stab">—</div><div class="cmap-sl">Stability</div></div>
+          <div class="cmap-s"><div class="cmap-sv" id="cmap-infl">—</div><div class="cmap-sl">Influence</div></div>
+          <div class="cmap-s"><div class="cmap-sv" id="cmap-mood">—</div><div class="cmap-sl">Pop. Mood</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer 3: Government room -->
+    <div class="layer-overlay" id="layer-gov">
+      <div class="gov-room">
+        <div class="gov-table-wrap">
+          <svg class="gov-table-svg" width="660" height="110" viewBox="0 0 660 110">
+            <ellipse cx="330" cy="105" rx="300" ry="65" stroke="rgba(184,150,62,0.45)" stroke-width="1" fill="none"/>
+            <ellipse cx="330" cy="105" rx="260" ry="52" stroke="rgba(184,150,62,0.15)" stroke-width="1" fill="rgba(184,150,62,0.025)"/>
+          </svg>
+        </div>
+        <div class="gov-agents" id="gov-agents"></div>
+        <div id="gov-chat"></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="ptoggle" onclick="togglePanel()">
+    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+
+  <div id="panel">
+    <div class="ptabs">
+      <button class="ptab on" onclick="setTab('ops',this)">Ops</button>
+      <button class="ptab" onclick="setTab('power',this)">Power</button>
+      <button class="ptab" onclick="setTab('agents',this)">Agents</button>
+      <button class="ptab" onclick="setTab('world',this)">World</button>
+      <button class="ptab" onclick="openChronicle()">📜</button>
+    </div>
+    <div id="pscroll">
+      <!-- OPS -->
+      <div class="tabp on" id="tab-ops">
+        <div class="cbox" id="cbox">
+          <div class="cbox-name" id="cbox-name">—</div>
+          <div class="cbox-meta" id="cbox-meta">Select a country on the globe</div>
+          <button class="abtn" onclick="act('spy')"><span class="ai">🕵</span>Deploy Spy<span class="ac">−150 💰</span></button>
+          <button class="abtn" onclick="act('media')"><span class="ai">📡</span>Propaganda<span class="ac">−80 💰</span></button>
+          <button class="abtn" onclick="act('econ')"><span class="ai">💹</span>Economic Pressure<span class="ac">−200 💰</span></button>
+          <button class="abtn" onclick="act('mil')"><span class="ai">⚔</span>Military Threat<span class="ac">−300 💰</span></button>
+          <button class="abtn" onclick="openDiplomacy()"><span class="ai">🤝</span>Propose Alliance<span class="ac">−50 💰</span></button>
+          <button class="abtn" onclick="declareWar()"><span class="ai">💥</span>Declare War<span class="ac">−500 💰</span></button>
+        </div>
+        <div class="psec-title">Global Operations</div>
+        <button class="abtn" onclick="gact('summit')"><span class="ai">🌐</span>Diplomatic Summit<span class="ac">−120 💰</span></button>
+        <button class="abtn" onclick="gact('trade')"><span class="ai">🚢</span>Trade Route Control<span class="ac">−180 💰</span></button>
+        <button class="abtn" onclick="gact('hack')"><span class="ai">💻</span>Cyber Offensive<span class="ac">−90 💰</span></button>
+        <button class="abtn" onclick="gact('disinfo')"><span class="ai">📰</span>Disinformation Drop<span class="ac">−60 💰</span></button>
+        <button class="abtn" style="margin-top:8px;border-color:rgba(231,76,60,0.25);color:var(--red2)" onclick="triggerVote('The opposition calls a confidence vote.')"><span class="ai">🗳</span>Confidence Vote</button>
+        <button class="abtn" style="border-color:rgba(184,150,62,0.2);color:var(--gold2)" onclick="triggerCinematicCrisis()"><span class="ai">⚡</span>Trigger Crisis [TEST]</button>
+      </div>
+      <!-- POWER -->
+      <div class="tabp" id="tab-power">
+        <div class="psec-title">Power Vectors</div>
+        <div class="ibar-row"><span class="ibar-lbl">Military</span><div class="ibar-track"><div class="ibar-fill" id="b-mil" style="width:45%;background:var(--red2)"></div></div><span class="ibar-pct" id="p-mil">45%</span></div>
+        <div class="ibar-row"><span class="ibar-lbl">Economic</span><div class="ibar-track"><div class="ibar-fill" id="b-eco" style="width:62%;background:var(--green2)"></div></div><span class="ibar-pct" id="p-eco">62%</span></div>
+        <div class="ibar-row"><span class="ibar-lbl">Narrative</span><div class="ibar-track"><div class="ibar-fill" id="b-nar" style="width:28%;background:var(--blue2)"></div></div><span class="ibar-pct" id="p-nar">28%</span></div>
+        <div class="ibar-row"><span class="ibar-lbl">Espionage</span><div class="ibar-track"><div class="ibar-fill" id="b-esp" style="width:17%;background:var(--gold)"></div></div><span class="ibar-pct" id="p-esp">17%</span></div>
+        <div class="ibar-row"><span class="ibar-lbl">Soft Power</span><div class="ibar-track"><div class="ibar-fill" id="b-sft" style="width:24%;background:var(--purple2)"></div></div><span class="ibar-pct" id="p-sft">24%</span></div>
+        <hr class="line"/>
+        <div class="psec-title">Sphere of Influence</div>
+        <div id="allied-list" style="font-family:var(--ff-mono);font-size:9px;color:var(--text3);line-height:2">— Expand to gain allies —</div>
+        <hr class="line"/>
+        <div class="psec-title">Active Wars</div>
+        <div id="war-list" style="font-family:var(--ff-mono);font-size:9px;color:var(--red2);line-height:2">— No active conflicts —</div>
+      </div>
+      <!-- AGENTS -->
+      <div class="tabp" id="tab-agents">
+        <button class="abtn" onclick="openAgentModal()" style="margin-bottom:12px;border-color:var(--border);color:var(--gold2)"><span class="ai">+</span>Recruit New Agent<span class="ac">−200 💰</span></button>
+        <div class="psec-title">Cabinet & Field Agents</div>
+        <div id="agents-list"></div>
+      </div>
+      <!-- WORLD -->
+      <div class="tabp" id="tab-world">
+        <div class="psec-title">Live Players</div>
+        <div id="players-list"></div>
+        <hr class="line"/>
+        <div class="psec-title">World Events</div>
+        <div id="world-feed" style="font-family:var(--ff-mono);font-size:9px;color:var(--text3);line-height:1.8"></div>
+        <hr class="line"/>
+        <div class="psec-title">Command Hierarchy</div>
+        <div class="hierarchy" id="hierarchy"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ CHRONICLE SCREEN ════ -->
+<div class="screen" id="s-chronicle">
+  <div class="chr-hdr">
+    <div>
+      <div class="chr-sub">Historical Record</div>
+      <h1>The Chronicle</h1>
+    </div>
+    <button class="btn-ghost" onclick="showScreen('s-game')">← Return to Command</button>
+  </div>
+  <div class="chr-body" id="chr-body"></div>
+  <div class="chr-footer">
+    <div class="chr-stat-row">
+      <div class="chr-stat"><div class="chr-stat-v" id="chr-epochs">1</div><div class="chr-stat-l">Epochs</div></div>
+      <div class="chr-stat"><div class="chr-stat-v" id="chr-actions">0</div><div class="chr-stat-l">Actions</div></div>
+      <div class="chr-stat"><div class="chr-stat-v" id="chr-allies">0</div><div class="chr-stat-l">Allies</div></div>
+      <div class="chr-stat"><div class="chr-stat-v" id="chr-crises">0</div><div class="chr-stat-l">Crises Survived</div></div>
+    </div>
+    <button class="btn-ghost" onclick="showScreen('s-game')">Close</button>
+  </div>
+</div>
+
+<!-- ════ CINEMATIC CRISIS SCREEN ════ -->
+<div class="screen" id="s-cinematic">
+  <div class="cin-bg"></div>
+  <div class="cin-scan"></div>
+  <div class="cin-content">
+    <div class="cin-label" id="cin-label">⚡ Breaking Crisis</div>
+    <div class="cin-title" id="cin-title">—</div>
+    <div class="cin-sub" id="cin-sub">—</div>
+    <div class="cin-report"><div class="cin-reporter" id="cin-reporter">Intelligence Brief · CLASSIFIED</div><div id="cin-text">—</div></div>
+    <div class="cin-choices" id="cin-choices"></div>
+  </div>
+  <div class="cin-timer" id="cin-timer">Awaiting your decision...</div>
+</div>
+
+<!-- ════ VOTE SCREEN ════ -->
+<div class="screen" id="s-vote">
+  <div class="vote-bg"></div>
+  <div class="vote-title">Confidence Vote</div>
+  <div class="vote-sub" id="vote-sub">The cabinet assembles</div>
+  <div class="vote-agents" id="vote-agents"></div>
+  <div class="vote-result" id="vote-result">
+    <div class="vote-result-title" id="vote-result-title">—</div>
+    <div class="vote-result-sub" id="vote-result-sub">—</div>
+  </div>
+  <button class="vote-close" id="vote-close" onclick="showScreen('s-game')">Return to Command</button>
+</div>
+
+<script>
+// ════════════════════════════════════
+// GAME STATE
+// ════════════════════════════════════
+const GS={
+  username:localStorage.getItem('digital_state_username')||'COMMANDER',
+  influence:0,capital:1200,nationsOwned:1,softPower:24,
+  military:45,economic:62,narrative:28,espionage:17,
+  epoch:1,epochProgress:0,frame:0,
+  panelOpen:true,
+  president:{name:'',avatar:'🤴',nation:null,bg:'mil',traits:[]},
+  agents:[],
+  cabinet:[
+    {name:"Viktor Hale",role:"Min. of Defense",emoji:"🎖",loyalty:"loyal",thought:"We must show strength before they doubt us."},
+    {name:"Lena Marsh",role:"Min. of Narrative",emoji:"📡",loyalty:"loyal",thought:"Control the story, control the world."},
+    {name:"Dmitri Volkov",role:"Chief of Intelligence",emoji:"🕵",loyalty:"suspicious",thought:"I've seen what happens to failed presidents."},
+    {name:"Chen Wei",role:"Min. of Economy",emoji:"💹",loyalty:"neutral",thought:"The numbers never lie. People always do."},
+    {name:"Sofia Reyes",role:"Foreign Affairs",emoji:"🌐",loyalty:"loyal",thought:"Every war is a failed negotiation."},
+  ],
+  countries:[
+    {name:"Russia",influence:12,stability:72,gdp:"$1.7T",status:"Hostile",flag:"🇷🇺"},
+    {name:"China",influence:8,stability:85,gdp:"$17T",status:"Rival",flag:"🇨🇳"},
+    {name:"Germany",influence:34,stability:91,gdp:"$4.2T",status:"Neutral",flag:"🇩🇪"},
+    {name:"Brazil",influence:22,stability:58,gdp:"$2.1T",status:"Neutral",flag:"🇧🇷"},
+    {name:"India",influence:15,stability:68,gdp:"$3.3T",status:"Neutral",flag:"🇮🇳"},
+    {name:"United Kingdom",influence:55,stability:88,gdp:"$3.1T",status:"Allied",flag:"🇬🇧"},
+    {name:"France",influence:48,stability:82,gdp:"$2.9T",status:"Allied",flag:"🇫🇷"},
+    {name:"Japan",influence:41,stability:94,gdp:"$4.4T",status:"Allied",flag:"🇯🇵"},
+    {name:"Saudi Arabia",influence:29,stability:65,gdp:"$0.9T",status:"Neutral",flag:"🇸🇦"},
+    {name:"Turkey",influence:18,stability:55,gdp:"$0.8T",status:"Neutral",flag:"🇹🇷"},
+    {name:"Mexico",influence:31,stability:60,gdp:"$1.3T",status:"Neutral",flag:"🇲🇽"},
+    {name:"Canada",influence:70,stability:96,gdp:"$2.1T",status:"Allied",flag:"🇨🇦"},
+    {name:"Nigeria",influence:14,stability:42,gdp:"$0.5T",status:"Neutral",flag:"🇳🇬"},
+    {name:"South Korea",influence:38,stability:88,gdp:"$1.7T",status:"Allied",flag:"🇰🇷"},
+  ],
+  wars:[],alliances:[],
+  chronicle:[],actionCount:0,crisesCount:0,
+  mockPlayers:[
+    {name:"StarikVlad",nation:"Russia",status:"online"},
+    {name:"DragonWei",nation:"China",status:"online"},
+    {name:"MacroGhost",nation:"France",status:"away"},
+    {name:"NipponShadow",nation:"Japan",status:"online"},
+    {name:"BerlinWulf",nation:"Germany",status:"offline"},
+  ],
+};
+
+// ════════════════════════════════════
+// DATA
+// ════════════════════════════════════
+const NATIONS=[
+  {id:'us',flag:'🇺🇸',name:'United States',bonus:'+25 Military'},
+  {id:'uk',flag:'🇬🇧',name:'United Kingdom',bonus:'+20 Espionage'},
+  {id:'cn',flag:'🇨🇳',name:'China',bonus:'+30 Economic'},
+  {id:'ru',flag:'🇷🇺',name:'Russia',bonus:'+25 Military'},
+  {id:'de',flag:'🇩🇪',name:'Germany',bonus:'+30 Economy'},
+  {id:'fr',flag:'🇫🇷',name:'France',bonus:'+20 Narrative'},
+  {id:'jp',flag:'🇯🇵',name:'Japan',bonus:'+25 Tech'},
+  {id:'br',flag:'🇧🇷',name:'Brazil',bonus:'+20 Soft Power'},
+];
+const BGS=[
+  {id:'mil',icon:'🎖',name:'Military',bonus:'+25 Military'},
+  {id:'biz',icon:'💼',name:'Business',bonus:'+200 Capital'},
+  {id:'spy',icon:'🕵',name:'Intelligence',bonus:'+20 Espionage'},
+  {id:'acad',icon:'📚',name:'Academic',bonus:'+20 Narrative'},
+  {id:'dip',icon:'🌐',name:'Diplomat',bonus:'+15 All allies'},
+  {id:'med',icon:'📺',name:'Media',bonus:'+25 Soft Power'},
+];
+const TRAITS=[
+  {id:'char',icon:'✨',name:'Charismatic',desc:'Soft power ×2'},
+  {id:'ruth',icon:'🗡',name:'Ruthless',desc:'Military −50% cost'},
+  {id:'strat',icon:'♟',name:'Strategist',desc:'+1 action/epoch'},
+  {id:'econ',icon:'📊',name:'Economist',desc:'Treasury +40%'},
+  {id:'spy',icon:'🔍',name:'Spymaster',desc:'Spy actions ×2'},
+  {id:'orat',icon:'🎤',name:'Orator',desc:'Crises never drain capital'},
+  {id:'par',icon:'👁',name:'Paranoid',desc:'Never betrayed'},
+  {id:'vis',icon:'🌌',name:'Visionary',desc:'Unlock secret events'},
+];
+const AGENT_SPECS=[
+  {id:'spy',icon:'🕵',name:'Field Spy',desc:'Infiltration & intel'},
+  {id:'prop',icon:'📡',name:'Propagandist',desc:'Narrative & media'},
+  {id:'econ',icon:'💹',name:'Economist',desc:'Economic sabotage'},
+  {id:'mil',icon:'⚔',name:'Military Advisor',desc:'Tactical pressure'},
+  {id:'hack',icon:'💻',name:'Cyber Agent',desc:'Digital warfare'},
+  {id:'dip',icon:'🤝',name:'Diplomat',desc:'Alliance building'},
+];
+const AGENT_AVATARS=['🕵','👤','👩‍💼','👨‍💼','🧔','👩‍🔬','🧑‍💻','🥷'];
+const MISSION_TYPES=[
+  {id:'infil',icon:'🚶',name:'Infiltrate',desc:'Place agent inside ministry',risk:'high',days:14,cost:200},
+  {id:'prop',icon:'📡',name:'Propaganda',desc:'Shift public opinion',risk:'med',days:7,cost:100},
+  {id:'sab',icon:'💣',name:'Sabotage',desc:'Crash supply chain',risk:'high',days:10,cost:250},
+  {id:'intel',icon:'🔍',name:'Intel Gather',desc:'Map enemy network',risk:'low',days:5,cost:80},
+  {id:'dip',icon:'🤝',name:'Secret Diplomacy',desc:'Back-channel alliance',risk:'low',days:8,cost:120},
+  {id:'elim',icon:'🗡',name:'Eliminate Asset',desc:'Remove enemy agent',risk:'high',days:3,cost:300},
+];
+
+const CINEMATIC_CRISES=[
+  {
+    label:'☢ Nuclear Alert',title:'NUCLEAR STANDOFF',sub:'Missiles Detected',
+    text:'Satellite imagery confirms three ICBM launches from an undisclosed location. NATO forces at DEFCON 2. All eyes on your response.',
+    choices:[
+      {label:'Diplomatic Hotline',type:'primary',mil:0,eco:-80,sft:20,cap:-100},
+      {label:'Military Response',type:'',mil:25,eco:-200,sft:-15,cap:-300},
+      {label:'Evacuate & Wait',type:'',mil:-10,eco:-50,sft:-20,cap:-50},
+    ]
+  },
+  {
+    label:'🌊 Climate Collapse',title:'COASTAL CATASTROPHE',sub:'Global Crisis',
+    text:'Six coastal megacities report catastrophic flooding. 40 million displaced. UN requests emergency aid. Your response will define your legacy.',
+    choices:[
+      {label:'Emergency Aid',type:'primary',mil:0,eco:-150,sft:40,cap:-200},
+      {label:'Secure Borders',type:'',mil:15,eco:0,sft:-30,cap:0},
+      {label:'Ignore & Profit',type:'',mil:0,eco:80,sft:-50,cap:200},
+    ]
+  },
+  {
+    label:'💻 Cyber Attack',title:'GRID OFFLINE',sub:'Infrastructure Failure',
+    text:'A coordinated cyber attack has taken down power grids across 12 nations. Banks frozen. Hospitals on backup. The source: unknown.',
+    choices:[
+      {label:'Launch Counter-Attack',type:'primary',mil:0,eco:-100,esp:30,cap:-150},
+      {label:'Negotiate Quietly',type:'',mil:0,eco:-50,sft:10,cap:-80},
+      {label:'Blame a Rival',type:'',mil:10,eco:0,nar:20,cap:0},
+    ]
+  },
+  {
+    label:'👽 First Contact',title:'SIGNAL RECEIVED',sub:'Classified — Eyes Only',
+    text:'Deep space monitoring stations across 4 continents confirm an artificial signal. Repeating. Mathematical. Unmistakably non-human. The world does not know yet.',
+    choices:[
+      {label:'Announce Publicly',type:'primary',mil:0,eco:50,sft:80,cap:0},
+      {label:'Classify It',type:'',mil:20,eco:0,sft:-10,cap:0},
+      {label:'Investigate Alone',type:'',mil:0,eco:0,esp:50,cap:-100},
+    ]
+  },
+  {
+    label:'💀 Assassination Plot',title:'THREAT CONFIRMED',sub:'Your Life In Danger',
+    text:'Intelligence has uncovered a credible plot against your life originating from within your own government. The suspect list has three names. All are ministers.',
+    choices:[
+      {label:'Purge the Cabinet',type:'primary',mil:10,eco:-50,sft:-20,cap:-100},
+      {label:'Set a Trap',type:'',mil:0,eco:0,esp:40,cap:-50},
+      {label:'Flee the Country',type:'',mil:-30,eco:-100,sft:-50,cap:0},
+    ]
+  },
+];
+
+const THOUGHTS=[
+  "Three ministers met without me. I am watching.",
+  "The opposition gains ground. We must act now.",
+  "Our propaganda is working. The youth believe us.",
+  "Someone in this cabinet is not who they claim to be.",
+  "The people grow restless. History won't forgive hesitation.",
+  "I am loyal. But loyalty has a price.",
+  "Two of our agents have gone dark in the east.",
+  "I've located an asset we can leverage immediately.",
+  "The numbers suggest we're three moves from collapse.",
+  "They underestimate us. Good.",
+];
+
+const DEBATES=[
+  ["Viktor Hale","Sofia Reyes","We must respond to China's military buildup immediately.","And start a war? Diplomacy costs less than funerals, Viktor."],
+  ["Chen Wei","Lena Marsh","The economic report is worse than we disclosed.","Then we change the narrative. That's my job."],
+  ["Dmitri Volkov","Viktor Hale","I've identified a foreign agent inside our infrastructure.","Finally. I suspected it for two epochs."],
+  ["Sofia Reyes","Chen Wei","Brazil signals interest in an alliance.","Their GDP is unstable. Wait for better terms."],
+  ["Lena Marsh","Dmitri Volkov","The media offensive is working. Approval up twelve points.","Don't trust polls. Trust what agents see on the ground."],
+  ["Viktor Hale","Chen Wei","We need to double the military budget.","We're already running a deficit. Absolutely not."],
+];
+
+// ════════════════════════════════════
+// CREATION SCREEN
+// ════════════════════════════════════
+let selNation=null,selBg='mil',selTraits=[],selAvatar='🤴',agentSelSpec=null,agentSelAvatar='🕵',missionSelType=null,missionAgentIdx=null;
+
+function buildCreation(){
+  const ng=document.getElementById('nation-grid');
+  NATIONS.forEach(n=>{
+    const d=document.createElement('div');d.className='pick-card';
+    d.innerHTML=`<div class="pick-icon">${n.flag}</div><div class="pick-name">${n.name}</div><div class="pick-sub">${n.bonus}</div>`;
+    d.onclick=()=>{selNation=n;document.getElementById('prev-nation').textContent=n.name.toUpperCase();ng.querySelectorAll('.pick-card').forEach(c=>c.classList.remove('sel'));d.classList.add('sel');};
+    ng.appendChild(d);
+  });
+  const bg=document.getElementById('bg-grid');
+  BGS.forEach(b=>{
+    const d=document.createElement('div');d.className='pick-card'+(b.id===selBg?' sel':'');
+    d.innerHTML=`<div class="pick-icon">${b.icon}</div><div class="pick-name">${b.name}</div><div class="pick-sub">${b.bonus}</div>`;
+    d.onclick=()=>{selBg=b.id;bg.querySelectorAll('.pick-card').forEach(c=>c.classList.remove('sel'));d.classList.add('sel');};
+    bg.appendChild(d);
+  });
+  const tg=document.getElementById('trait-grid');
+  TRAITS.forEach(t=>{
+    const d=document.createElement('div');d.className='pick-card';
+    d.innerHTML=`<div class="pick-icon">${t.icon}</div><div class="pick-name">${t.name}</div><div class="pick-sub">${t.desc}</div>`;
+    d.onclick=()=>{if(selTraits.includes(t.id)){selTraits=selTraits.filter(x=>x!==t.id);d.classList.remove('sel');}else if(selTraits.length<2){selTraits.push(t.id);d.classList.add('sel');}};
+    tg.appendChild(d);
+  });
+}
+buildCreation();
+
+function updateTags(){
+  const lc=+document.getElementById('sl1').value,gn=+document.getElementById('sl2').value,dh=+document.getElementById('sl3').value;
+  const t1=lc<35?'Liberal':lc>65?'Conservative':'Centrist';
+  const t2=gn>60?'Nationalist':gn<35?'Globalist':'Pragmatist';
+  const t3=dh>65?'Hawk':dh<35?'Dove':'Realist';
+  document.getElementById('prev-tags').innerHTML=[t1,t2,t3].map(t=>`<span class="prev-tag">${t}</span>`).join('');
+}
+
+function logout(){localStorage.removeItem('digital_state_username');window.location.href='/landing.html';}
+
+function launchGame(){
+  GS.president.name=document.getElementById('pname').value||'A. President';
+  GS.president.nation=selNation;
+  showScreen('s-game');
+  initGame();
+}
+
+// ════════════════════════════════════
+// SCREENS
+// ════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+let gameStarted=false;
+function initGame(){
+  if(gameStarted)return;gameStarted=true;
+  document.getElementById('hud-user').textContent=GS.username.toUpperCase()+' · '+(GS.president.nation?.name||'GLOBAL OPERATOR').toUpperCase();
+  document.getElementById('ptoggle').style.right='360px';
+  document.getElementById('toast').style.right='376px';
+  renderAgents();renderHierarchy();renderPlayers();updateStats();updateBars();buildWorldFeed();
+  addEvt('Command channel open. The world awaits your move.','green');
+  addEvt('Intelligence reports incoming from 3 continents.');
+  addChronicleEntry('Dawn of Power','Your presidency begins.','You have taken command. The world watches. History begins now.',{type:'green'});
+  setLayer(1,document.querySelector('.layer-btn'));
+  gameLoop();
+}
+
+// ════════════════════════════════════
+// PANEL TOGGLE
+// ════════════════════════════════════
+function togglePanel(){
+  GS.panelOpen=!GS.panelOpen;
+  const W=360;
+  document.getElementById('panel').classList.toggle('closed',!GS.panelOpen);
+  document.getElementById('ptoggle').classList.toggle('closed',!GS.panelOpen);
+  document.getElementById('globe-area').classList.toggle('panel-closed',!GS.panelOpen);
+  document.getElementById('globe-area').style.marginRight=GS.panelOpen?W+'px':'0px';
+  document.getElementById('ptoggle').style.right=GS.panelOpen?W+'px':'0px';
+  const toast=document.getElementById('toast');
+  toast.style.right=GS.panelOpen?(W+16)+'px':'16px';
+  toast.classList.toggle('closed',!GS.panelOpen);
+}
+
+// ════════════════════════════════════
+// TABS
+// ════════════════════════════════════
+function setTab(id,btn){
+  document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tabp').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  const el=document.getElementById('tab-'+id);
+  if(el)el.classList.add('on');
+}
+
+// ════════════════════════════════════
+// LAYER SYSTEM
+// ════════════════════════════════════
+let currentLayer=1;
+function setLayer(n,btn){
+  currentLayer=n;
+  document.querySelectorAll('.layer-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('layer-country').classList.remove('visible');
+  document.getElementById('layer-gov').classList.remove('visible');
+  const iframe=document.getElementById('globe-iframe');
+  const feed=document.getElementById('evt-feed');
+  if(n===1){iframe.style.opacity='1';iframe.style.pointerEvents='auto';feed.style.display='flex';}
+  else{iframe.style.opacity='0.12';iframe.style.pointerEvents='none';feed.style.display='none';}
+  if(n===2){document.getElementById('layer-country').classList.add('visible');buildCountryMap(GS.targetCountry||GS.countries[2]);}
+  if(n===3){document.getElementById('layer-gov').classList.add('visible');buildGovRoom();}
+}
+
+document.addEventListener('wheel',e=>{
+  if(!document.getElementById('s-game').classList.contains('active'))return;
+  const panel=document.getElementById('panel');
+  if(e.clientX>panel.getBoundingClientRect().left)return;
+  e.preventDefault();
+  const next=Math.max(1,Math.min(3,currentLayer+(e.deltaY>0?1:-1)));
+  if(next!==currentLayer){const btns=document.querySelectorAll('.layer-btn');setLayer(next,btns[next-1]);}
+},{passive:false});
+
+// ════════════════════════════════════
+// COUNTRY MAP
+// ════════════════════════════════════
+const REGIONS=[
+  {name:'Capital',color:'rgba(184,150,62,0.12)',style:'left:35%;top:20%;width:30%;height:22%'},
+  {name:'North',color:'rgba(26,74,122,0.1)',style:'left:20%;top:4%;width:60%;height:18%'},
+  {name:'Industrial Zone',color:'rgba(231,76,60,0.07)',style:'left:4%;top:28%;width:26%;height:30%'},
+  {name:'Farmlands',color:'rgba(39,174,96,0.07)',style:'left:70%;top:26%;width:26%;height:30%'},
+  {name:'Coast',color:'rgba(41,128,185,0.09)',style:'left:10%;top:62%;width:80%;height:16%'},
+];
+function buildCountryMap(c){
+  if(!c)return;
+  document.getElementById('cmap-title').textContent=`${c.flag} ${c.name.toUpperCase()}`;
+  document.getElementById('cmap-gdp').textContent=c.gdp;
+  document.getElementById('cmap-stab').textContent=c.stability+'%';
+  document.getElementById('cmap-infl').textContent=c.influence+'%';
+  document.getElementById('cmap-mood').textContent=c.stability>75?'😊':c.stability>50?'😐':'😠';
+  const map=document.getElementById('cmap');
+  map.querySelectorAll('.cmap-region').forEach(el=>el.remove());
+  REGIONS.forEach(r=>{
+    const div=document.createElement('div');div.className='cmap-region';
+    div.style.cssText=r.style+`;background:${r.color};`;
+    div.innerHTML=`<span class="rlbl">${r.name}</span>`;
+    map.appendChild(div);
+  });
+  const dots=document.getElementById('hap-dots');dots.innerHTML='';
+  const total=60;
+  for(let i=0;i<total;i++){
+    const d=document.createElement('div');d.className='hap-dot';
+    d.style.background=i<(c.stability/100*total)?`hsl(${110+Math.random()*30},55%,${33+Math.random()*18}%)`:'rgba(70,70,70,0.35)';
+    dots.appendChild(d);
+  }
+}
+
+// ════════════════════════════════════
+// GOV ROOM
+// ════════════════════════════════════
+let debateIdx=0,chatPhase=0,chatTimer=null;
+
+function buildGovRoom(){
+  const cont=document.getElementById('gov-agents');cont.innerHTML='';
+  GS.cabinet.forEach((a,i)=>{
+    const el=document.createElement('div');el.className='gov-agent';el.id='ga-'+i;
+    const lc=a.loyalty==='loyal'?'var(--green2)':a.loyalty==='suspicious'?'var(--red2)':'var(--gold)';
+    el.innerHTML=`<div class="speech-bub" id="bub-${i}"></div><div class="gov-ava-wrap">${a.emoji}<div class="gov-lbar" style="background:${lc}"></div></div><div class="gov-aname">${a.name.split(' ')[0]}</div>`;
+    el.onclick=()=>showBub(i,a.thought);
+    cont.appendChild(el);
+  });
+  startGovChat();
+}
+function showBub(idx,text){
+  document.querySelectorAll('.speech-bub').forEach(b=>{b.classList.remove('show');b.textContent='';});
+  const b=document.getElementById('bub-'+idx);if(b){b.textContent=text;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),3500);}
+}
+function startGovChat(){
+  if(chatTimer)clearInterval(chatTimer);
+  document.getElementById('gov-chat').innerHTML='';
+  chatPhase=0;debateIdx=Math.floor(Math.random()*DEBATES.length);
+  runChatLine();chatTimer=setInterval(runChatLine,4200);
+}
+function runChatLine(){
+  const chat=document.getElementById('gov-chat');if(!chat)return;
+  const deb=DEBATES[debateIdx%DEBATES.length];
+  const speaker=chatPhase%2===0?deb[0]:deb[1];
+  const line=chatPhase%2===0?deb[2]:deb[3];
+  const idx=GS.cabinet.findIndex(a=>a.name===speaker);
+  document.querySelectorAll('.gov-agent').forEach(e=>e.classList.remove('speaking'));
+  if(idx>=0){const el=document.getElementById('ga-'+idx);if(el){el.classList.add('speaking');showBub(idx,line);}}
+  const msg=document.createElement('div');msg.className='gov-msg';
+  msg.innerHTML=`<strong>${speaker}:</strong> ${line}`;
+  chat.insertBefore(msg,chat.firstChild);
+  setTimeout(()=>msg.classList.add('show'),40);
+  while(chat.children.length>3)chat.removeChild(chat.lastChild);
+  chatPhase++;if(chatPhase>=2){chatPhase=0;debateIdx++;}
+}
+
+// ════════════════════════════════════
+// EVENTS
+// ════════════════════════════════════
+const evtQ=[];
+function addEvt(text,type=''){
+  const feed=document.getElementById('evt-feed');if(!feed)return;
+  const now=new Date();
+  const t=`EP${GS.epoch}·${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const el=document.createElement('div');el.className=`evt ${type}`;
+  el.innerHTML=`<span class="evt-t">${t}</span>${text}`;
+  feed.insertBefore(el,feed.firstChild);
+  evtQ.push(el);if(evtQ.length>5){evtQ.shift().remove();}
+  setTimeout(()=>el.style.opacity='0.3',10000);
+}
+
+// ════════════════════════════════════
+// TOAST
+// ════════════════════════════════════
+let toastT=null;
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  if(toastT)clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ════════════════════════════════════
+// COUNTRY SELECT
+// ════════════════════════════════════
+function selectCountry(c){
+  GS.targetCountry=c;
+  document.getElementById('cbox').classList.add('on');
+  document.getElementById('cbox-name').textContent=`${c.flag} ${c.name}`;
+  document.getElementById('cbox-meta').textContent=`STABILITY ${c.stability}% · GDP ${c.gdp} · ${c.status.toUpperCase()}`;
+  addEvt(`Target locked: ${c.name}`,c.status==='Allied'?'green':c.status==='Hostile'?'red':'');
+  setTab('ops',document.querySelector('.ptab'));
+  if(currentLayer===2)buildCountryMap(c);
+}
+
+// ════════════════════════════════════
+// ACTIONS
+// ════════════════════════════════════
+function act(type){
+  const c=GS.targetCountry;if(!c){showToast('Select a country first.');return;}
+  const costs={spy:150,media:80,econ:200,mil:300};
+  if(GS.capital<costs[type]){addEvt('Insufficient treasury.','red');return;}
+  GS.capital-=costs[type];GS.actionCount++;
+  ({spy:()=>{c.influence+=8;GS.espionage=Math.min(100,GS.espionage+3);},media:()=>{c.influence+=5;GS.narrative=Math.min(100,GS.narrative+4);GS.softPower+=3;},econ:()=>{c.influence+=10;c.stability=Math.max(10,c.stability-12);GS.economic=Math.min(100,GS.economic+5);},mil:()=>{c.influence+=15;c.stability=Math.max(5,c.stability-20);GS.military=Math.min(100,GS.military+6);}})[type]();
+  addEvt({spy:`Agent inserted into ${c.name}.`,media:`Propaganda wave hits ${c.name}.`,econ:`Economic pressure on ${c.name}.`,mil:`Military threat to ${c.name}.`}[type],type==='mil'?'red':'green');
+  if(c.influence>=75&&c.status!=='Allied'){setTimeout(()=>{c.status='Allied';GS.nationsOwned++;GS.capital+=300;addEvt(`🏴 ${c.name} enters your sphere!`,'green');addChronicleEntry(`Nation Acquired`,`${c.name} pledges loyalty.`,`Through sustained pressure and strategic maneuvering, ${c.name} has joined your sphere of influence.`,{type:'green'});updateStats();renderAllied();renderHierarchy();},1400);}
+  updateStats();updateBars();
+}
+function gact(type){
+  const costs={summit:120,trade:180,hack:90,disinfo:60};
+  if(GS.capital<costs[type]){addEvt('Insufficient treasury.','red');return;}
+  GS.capital-=costs[type];GS.actionCount++;
+  ({summit:()=>{GS.softPower+=12;},trade:()=>{GS.economic=Math.min(100,GS.economic+5);GS.capital+=60;},hack:()=>{GS.espionage=Math.min(100,GS.espionage+7);},disinfo:()=>{GS.narrative=Math.min(100,GS.narrative+6);GS.softPower+=4;}})[type]();
+  addEvt({summit:'Diplomatic summit convened.',trade:'Trade routes seized.',hack:'Cyber offensive launched.',disinfo:'Disinformation seeded.'}[type],'blue');
+  updateStats();updateBars();
+}
+function openDiplomacy(){
+  const c=GS.targetCountry;if(!c){showToast('Select a country first.');return;}
+  if(GS.capital<50){showToast('Need 50 💰');return;}
+  GS.capital-=50;c.influence+=12;
+  addEvt(`Alliance proposal sent to ${c.name}.`,'blue');
+  if(c.influence>=60){c.status='Allied';GS.nationsOwned++;GS.alliances.push(c.name);addEvt(`${c.name} accepted alliance! 🤝`,'green');renderAllied();renderHierarchy();}
+  updateStats();
+}
+function declareWar(){
+  const c=GS.targetCountry;if(!c){showToast('Select a target first.');return;}
+  if(GS.capital<500){addEvt('War requires 500 💰','red');return;}
+  GS.capital-=500;c.status='Hostile';GS.wars.push({against:c.name,started:GS.epoch});
+  addEvt(`⚔ WAR DECLARED: ${c.name}!`,'red');
+  addChronicleEntry(`War Declared`,`Conflict with ${c.name} begins.`,`Your forces mobilize against ${c.name}. The international community watches in silence. History will judge this moment.`,{type:'red'});
+  document.getElementById('war-list').innerHTML=GS.wars.map(w=>`⚔ vs ${w.against}`).join('<br>')||'— No active conflicts —';
+  updateStats();
+}
+
+// ════════════════════════════════════
+// STATS
+// ════════════════════════════════════
+function updateStats(){
+  document.getElementById('st-i').textContent=GS.influence;
+  document.getElementById('st-c').textContent=GS.capital.toLocaleString();
+  document.getElementById('st-n').textContent=GS.nationsOwned;
+  document.getElementById('st-s').textContent=GS.softPower;
+}
+function updateBars(){
+  [['mil',GS.military],['eco',GS.economic],['nar',GS.narrative],['esp',GS.espionage],['sft',GS.softPower]].forEach(([k,v])=>{
+    const b=document.getElementById('b-'+k),p=document.getElementById('p-'+k);
+    if(b)b.style.width=v+'%';if(p)p.textContent=v+'%';
+  });
+}
+function renderAllied(){
+  const el=document.getElementById('allied-list');if(!el)return;
+  const a=GS.countries.filter(c=>c.status==='Allied');
+  el.innerHTML=a.map(c=>`${c.flag} ${c.name}`).join('<br>')||'— No allies yet —';
+}
+
+// ════════════════════════════════════
+// AGENTS
+// ════════════════════════════════════
+function renderAgents(){
+  const list=document.getElementById('agents-list');if(!list)return;list.innerHTML='';
+  [...GS.cabinet,...GS.agents].forEach((a,i)=>{
+    const el=document.createElement('div');el.className='agent-card';
+    const lc=a.loyalty==='loyal'?'var(--green2)':a.loyalty==='suspicious'?'var(--red2)':'var(--gold)';
+    const bc=a.loyalty==='loyal'?'bl':a.loyalty==='suspicious'?'bs':'bn';
+    const isField=i>=GS.cabinet.length;
+    el.innerHTML=`<div class="ac-stripe" style="background:${lc}"></div><div class="ac-top"><div class="ac-ava">${a.emoji||a.avatar||'👤'}</div><div><div class="ac-name">${a.name}</div><div class="ac-role">${(a.role||a.spec||'').toUpperCase()}</div><span class="ac-badge ${bc}">${a.loyalty.toUpperCase()}</span>${isField?'<span class="ac-badge bm" style="margin-left:4px">FIELD</span>':''}</div></div><div class="ac-thought">${a.thought||'Awaiting orders.'}</div>${a.onMission?`<div class="ac-mission">▶ ${a.onMission.type} → ${a.onMission.target}</div>`:''}${isField&&!a.onMission?`<button class="abtn" style="margin-top:6px;font-size:11px" onclick="openMissionModal(${i-GS.cabinet.length})"><span class="ai">🚀</span>Assign Mission</button>`:''}`;
+    list.appendChild(el);
+  });
+}
+function openAgentModal(){
+  agentSelSpec=null;agentSelAvatar='🕵';
+  document.getElementById('a-name').value='';document.getElementById('a-code').value='';document.getElementById('a-age').value='';
+  const sg=document.getElementById('spec-grid');sg.innerHTML='';
+  AGENT_SPECS.forEach(s=>{const d=document.createElement('div');d.className='pick-card';d.innerHTML=`<div class="pick-icon">${s.icon}</div><div class="pick-name">${s.name}</div><div class="pick-sub">${s.desc}</div>`;d.onclick=()=>{agentSelSpec=s;sg.querySelectorAll('.pick-card').forEach(c=>c.classList.remove('sel'));d.classList.add('sel');genBg();};sg.appendChild(d);});
+  const ag=document.getElementById('a-avatar-grid');ag.innerHTML='';
+  AGENT_AVATARS.forEach(av=>{const d=document.createElement('div');d.className='pick-card';d.innerHTML=`<div style="font-size:22px;margin:2px 0">${av}</div>`;d.onclick=()=>{agentSelAvatar=av;ag.querySelectorAll('.pick-card').forEach(c=>c.classList.remove('sel'));d.classList.add('sel');};ag.appendChild(d);});
+  document.getElementById('agent-modal').classList.add('on');
+}
+function genBg(){
+  if(!agentSelSpec)return;
+  const age=document.getElementById('a-age').value||'34';
+  const s={spy:`Former intelligence operative, age ${age}. Trained in 3 countries. Speaks 4 languages. Has a sealed file from an incident in Prague.`,prop:`Ex-media journalist. Knows exactly how to make people believe what they see. Has a gambling debt.`,econ:`Former central banker. Ran shadow accounts for two governments. Can be bought.`,mil:`Decorated officer, age ${age}. Three deployments. Court-martialed once; charges dropped.`,hack:`Self-taught digital warfare specialist. No official footprint — officially.`,dip:`Trained diplomat with back-channel contacts in 12 nations. Collects secrets for sport.`};
+  document.getElementById('bg-story').textContent=s[agentSelSpec.id]||'Background pending...';
+}
+function closeAgentModal(){document.getElementById('agent-modal').classList.remove('on');}
+function recruitAgent(){
+  if(GS.capital<200){showToast('Need 200 💰');return;}
+  const name=document.getElementById('a-name').value.trim();
+  if(!name){showToast('Agent needs a name.');return;}
+  if(!agentSelSpec){showToast('Select a specialty.');return;}
+  GS.capital-=200;
+  GS.agents.push({name,emoji:agentSelAvatar,spec:agentSelSpec.name,loyalty:'loyal',thought:'Ready for orders.',onMission:null});
+  closeAgentModal();renderAgents();renderHierarchy();
+  addEvt(`Agent ${name} recruited.`,'green');updateStats();
+}
+function openMissionModal(idx){
+  missionAgentIdx=idx;missionSelType=null;
+  document.getElementById('mission-target').innerHTML=GS.countries.map(c=>`<option value="${c.name}">${c.flag} ${c.name}</option>`).join('');
+  const mt=document.getElementById('mission-types');mt.innerHTML='';
+  MISSION_TYPES.forEach(m=>{const d=document.createElement('div');d.className='mission-type';d.innerHTML=`<span class="mt-icon">${m.icon}</span><div><div class="mt-name">${m.name}</div><div class="mt-desc">${m.desc} · ${m.days}d · −${m.cost}💰</div></div><span class="mt-risk risk-${m.risk}">${m.risk.toUpperCase()}</span>`;d.onclick=()=>{missionSelType=m;mt.querySelectorAll('.mission-type').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');};mt.appendChild(d);});
+  document.getElementById('mission-modal').classList.add('on');
+}
+function closeMissionModal(){document.getElementById('mission-modal').classList.remove('on');}
+function confirmMission(){
+  if(!missionSelType){showToast('Select mission type.');return;}
+  if(GS.capital<missionSelType.cost){showToast(`Need ${missionSelType.cost} 💰`);return;}
+  const agent=GS.agents[missionAgentIdx];const target=document.getElementById('mission-target').value;
+  GS.capital-=missionSelType.cost;
+  agent.onMission={type:missionSelType.name,target,days:missionSelType.days};
+  closeMissionModal();renderAgents();addEvt(`${agent.name} deployed → ${target}.`,'blue');updateStats();
+  setTimeout(()=>{
+    const ok=Math.random()>0.3;
+    const c=GS.countries.find(x=>x.name===target);
+    if(ok){if(c)c.influence=Math.min(100,c.influence+15);addEvt(`✅ ${agent.name} mission success.`,'green');}
+    else{addEvt(`❌ ${agent.name} captured in ${target}.`,'red');agent.loyalty='suspicious';}
+    agent.onMission=null;renderAgents();
+  },missionSelType.days*1800);
+}
+
+// ════════════════════════════════════
+// HIERARCHY
+// ════════════════════════════════════
+function renderHierarchy(){
+  const h=document.getElementById('hierarchy');if(!h)return;
+  const p=GS.president;const allies=GS.countries.filter(c=>c.status==='Allied');
+  h.innerHTML=`<div class="hier-president"><div style="font-size:26px;margin-bottom:5px">${p.avatar||'🤴'}</div><div class="hier-pname">${p.name||GS.username}</div><div class="hier-prole">PRESIDENT · ${p.nation?.name||'GLOBAL OPERATOR'}</div></div>
+  <div class="hier-row"><div class="hier-row-label">Cabinet</div><div class="hier-cards">${GS.cabinet.map(a=>{const lc=a.loyalty==='loyal'?'var(--green2)':a.loyalty==='suspicious'?'var(--red2)':'var(--gold)';return`<div class="hcard"><div class="hcard-dot" style="background:${lc}"></div><div class="hcard-info"><div class="hcard-name">${a.emoji} ${a.name}</div><div class="hcard-role">${a.role.toUpperCase()}</div></div><span class="hcard-status" style="color:${lc};border-color:${lc}">${a.loyalty.toUpperCase()}</span></div>`;}).join('')}</div></div>
+  ${GS.agents.length?`<div class="hier-conn"></div><div class="hier-row"><div class="hier-row-label">Agents</div><div class="hier-cards">${GS.agents.map(a=>`<div class="hcard"><div class="hcard-dot" style="background:var(--blue2)"></div><div class="hcard-info"><div class="hcard-name">${a.emoji} ${a.name}</div><div class="hcard-role">${(a.spec||'').toUpperCase()}</div></div><span class="hcard-status" style="color:var(--blue2);border-color:var(--blue2)">${a.onMission?'ACTIVE':'STANDBY'}</span></div>`).join('')}</div></div>`:''}
+  ${allies.length?`<div class="hier-conn"></div><div class="hier-row"><div class="hier-row-label">Allies</div><div class="hier-cards">${allies.map(c=>`<div class="hcard"><div class="hcard-dot" style="background:var(--green2)"></div><div class="hcard-info"><div class="hcard-name">${c.flag} ${c.name}</div><div class="hcard-role">ALLY · ${c.influence}% INFLUENCE</div></div></div>`).join('')}</div></div>`:''}`;
+}
+
+// ════════════════════════════════════
+// MULTIPLAYER
+// ════════════════════════════════════
+function renderPlayers(){
+  const list=document.getElementById('players-list');if(!list)return;list.innerHTML='';
+  GS.mockPlayers.forEach(p=>{
+    const d=document.createElement('div');d.className='mp-player';
+    d.innerHTML=`<div class="mp-dot ${p.status==='away'?'away':p.status==='offline'?'offline':''}"></div><div><div class="mp-name">${p.name}</div><div class="mp-nation">${p.nation} · ${p.status.toUpperCase()}</div></div><button class="mp-action ally" onclick="showToast('Alliance sent to ${p.name}')">ALLY</button><button class="mp-action war" onclick="showToast('War declared on ${p.name}')">WAR</button>`;
+    list.appendChild(d);
+  });
+}
+function buildWorldFeed(){
+  const feed=document.getElementById('world-feed');if(!feed)return;
+  const events=['🇷🇺 StarikVlad declares war on Saudi Arabia.','🇨🇳 DragonWei forms trade pact with India.','🇫🇷 MacroGhost launches propaganda offensive.','🇯🇵 NipponShadow deploys 2 agents to Turkey.','🌍 Global stability: 62% — declining.'];
+  feed.innerHTML=events.map(e=>`<div style="padding:5px 0;border-bottom:1px solid var(--border2)">${e}</div>`).join('');
+}
+
+// ════════════════════════════════════
+// CHRONICLE
+// ════════════════════════════════════
+function addChronicleEntry(headline,sub,text,opts={}){
+  GS.chronicle.push({epoch:GS.epoch,headline,sub,text,type:opts.type||''});
+}
+
+function openChronicle(){
+  // Update stats
+  document.getElementById('chr-epochs').textContent=GS.epoch;
+  document.getElementById('chr-actions').textContent=GS.actionCount;
+  document.getElementById('chr-allies').textContent=GS.countries.filter(c=>c.status==='Allied').length;
+  document.getElementById('chr-crises').textContent=GS.crisesCount;
+  // Build entries
+  const body=document.getElementById('chr-body');body.innerHTML='';
+  if(GS.chronicle.length===0){body.innerHTML='<div style="font-family:var(--ff-mono);font-size:10px;color:var(--text2);padding:20px 0">No history yet. Your chronicle will be written through your actions.</div>';return;}
+  [...GS.chronicle].reverse().forEach(e=>{
+    const div=document.createElement('div');div.className=`chr-entry ${e.type||''}`;
+    div.innerHTML=`<div class="chr-epoch">EPOCH ${e.epoch} — ${['Dawn of Power','The Shadow Wars','The Great Game','Iron Curtain','Final Dominion'][e.epoch-1]||'Unknown Era'}</div><div class="chr-headline">${e.headline}</div><div class="chr-text">${e.text}</div>${e.sub?`<div class="chr-quote">${e.sub}</div>`:''}`;
+    body.appendChild(div);
+  });
+  showScreen('s-chronicle');
+}
+
+// ════════════════════════════════════
+// CINEMATIC CRISIS
+// ════════════════════════════════════
+let cinTimerInterval=null;
+
+function triggerCinematicCrisis(forced){
+  const crisis=forced||CINEMATIC_CRISES[Math.floor(Math.random()*CINEMATIC_CRISES.length)];
+  document.getElementById('cin-label').textContent=crisis.label;
+  document.getElementById('cin-title').textContent=crisis.title;
+  document.getElementById('cin-sub').textContent=crisis.sub;
+  document.getElementById('cin-text').textContent=crisis.text;
+  document.getElementById('cin-reporter').textContent=`Intelligence Brief · EPOCH ${GS.epoch} · CLASSIFIED`;
+  const cc=document.getElementById('cin-choices');cc.innerHTML='';
+  crisis.choices.forEach(ch=>{
+    const btn=document.createElement('button');
+    btn.className=`cin-choice ${ch.type||''}`;btn.textContent=ch.label;
+    btn.onclick=()=>resolveCinCrisis(ch,crisis);
+    cc.appendChild(btn);
+  });
+  // Timer countdown
+  let secs=60;
+  if(cinTimerInterval)clearInterval(cinTimerInterval);
+  document.getElementById('cin-timer').textContent=`Decision required in ${secs}s`;
+  cinTimerInterval=setInterval(()=>{
+    secs--;document.getElementById('cin-timer').textContent=`Decision required in ${secs}s`;
+    if(secs<=0){clearInterval(cinTimerInterval);resolveCinCrisis(crisis.choices[crisis.choices.length-1],crisis);}
+  },1000);
+  showScreen('s-cinematic');
+}
+
+function resolveCinCrisis(choice,crisis){
+  clearInterval(cinTimerInterval);
+  if(choice.mil)GS.military=Math.max(0,Math.min(100,GS.military+choice.mil));
+  if(choice.eco)GS.capital=Math.max(0,GS.capital+(choice.eco>0?choice.eco:choice.eco));
+  if(choice.sft)GS.softPower=Math.max(0,GS.softPower+choice.sft);
+  if(choice.esp)GS.espionage=Math.max(0,Math.min(100,GS.espionage+choice.esp));
+  if(choice.nar)GS.narrative=Math.max(0,Math.min(100,GS.narrative+choice.nar));
+  if(choice.cap)GS.capital=Math.max(0,GS.capital+choice.cap);
+  GS.crisesCount++;
+  addChronicleEntry(crisis.title,`Response: ${choice.label}`,`A critical moment: ${crisis.text} Your decision — "${choice.label}" — will echo through history.`,{type:'red'});
+  addEvt(`Crisis resolved: ${crisis.title}. Decision: ${choice.label}`,'red');
+  updateStats();updateBars();
+  showScreen('s-game');
+}
+
+// ════════════════════════════════════
+// VOTE SCREEN
+// ════════════════════════════════════
+function triggerVote(reason){
+  document.getElementById('vote-sub').textContent=reason||'The cabinet assembles.';
+  const cont=document.getElementById('vote-agents');cont.innerHTML='';
+  GS.cabinet.forEach((a,i)=>{
+    const el=document.createElement('div');el.className='vote-card';el.id='vc-'+i;
+    el.innerHTML=`<div class="vote-ava">${a.emoji}</div><div class="vote-name">${a.name}</div><div class="vote-verdict" id="vv-${i}">—</div>`;
+    cont.appendChild(el);
+  });
+  document.getElementById('vote-result').classList.remove('show');
+  document.getElementById('vote-close').classList.remove('show');
+  showScreen('s-vote');
+  let f=0,ag=0;
+  GS.cabinet.forEach((a,i)=>{
+    setTimeout(()=>{
+      const card=document.getElementById('vc-'+i);const verd=document.getElementById('vv-'+i);
+      if(!card)return;
+      const vote=a.loyalty==='loyal'?'for':a.loyalty==='suspicious'?'against':Math.random()>0.5?'for':'against';
+      if(vote==='for')f++;else ag++;
+      card.classList.add('revealed',vote);verd.textContent=vote==='for'?'FOR':'AGAINST';
+      if(i===GS.cabinet.length-1){
+        setTimeout(()=>{
+          const win=f>ag;
+          const res=document.getElementById('vote-result');
+          document.getElementById('vote-result-title').textContent=win?'You Survive':'You Are Removed';
+          document.getElementById('vote-result-title').style.color=win?'var(--green2)':'var(--red2)';
+          document.getElementById('vote-result-sub').textContent=win?`${f} FOR · ${ag} AGAINST`:`${ag} AGAINST · ${f} FOR`;
+          res.classList.add('show');document.getElementById('vote-close').classList.add('show');
+          addChronicleEntry('Confidence Vote',win?'You survived.':'Removed from power.',`The cabinet voted ${f}–${ag}. ${win?'Your grip on power holds.':'A new era begins without you.'}`,{type:win?'green':'red'});
+          addEvt(win?`Vote survived: ${f}–${ag}`:`Removed: ${ag}–${f}`,win?'green':'red');
+        },800);
+      }
+    },(i+1)*900);
+  });
+}
+
+// ════════════════════════════════════
+// EPOCH & CRISIS
+// ════════════════════════════════════
+const EPOCH_NAMES=['Dawn of Power','The Shadow Wars','The Great Game','Iron Curtain','Final Dominion'];
+let epochTimer=0;
+
+function tickEpoch(){
+  epochTimer++;GS.frame++;
+  const pct=(epochTimer%600)/600*100;
+  const fill=document.getElementById('ep-fill');if(fill)fill.style.width=pct+'%';
+  if(epochTimer%90===0){
+    const inc=50+GS.nationsOwned*25+Math.floor(GS.economic/8);
+    GS.capital+=inc;GS.influence=Math.min(9999,GS.influence+GS.nationsOwned*3+1);
+    updateStats();
+  }
+  if(epochTimer%240===0){
+    [...GS.cabinet,...GS.agents].forEach(a=>{
+      if(Math.random()>0.6)a.thought=THOUGHTS[Math.floor(Math.random()*THOUGHTS.length)];
+      if(Math.random()<0.04)a.loyalty=a.loyalty==='loyal'?'neutral':a.loyalty==='neutral'?'suspicious':'neutral';
+    });
+    renderAgents();
+  }
+  if(epochTimer%600===0&&epochTimer>0){
+    GS.epoch=Math.min(5,GS.epoch+1);
+    const en=document.getElementById('ep-name');
+    if(en)en.textContent=`Epoch ${GS.epoch} — ${EPOCH_NAMES[GS.epoch-1]}`;
+    addEvt(`New epoch: ${EPOCH_NAMES[GS.epoch-1]}`);
+    addChronicleEntry(EPOCH_NAMES[GS.epoch-1],`Epoch ${GS.epoch} begins.`,`The world enters a new phase. Power shifts. Alliances strain. Your next moves will define the era.`);
+    if(Math.random()>0.35)triggerCinematicCrisis();
+  }
+}
+
+function gameLoop(){tickEpoch();setTimeout(gameLoop,33);}
+
+// ════════════════════════════════════
+// INIT CHECK
+// ════════════════════════════════════
+window.addEventListener('load',()=>{
+  if(!localStorage.getItem('digital_state_username')){window.location.href='/landing.html';return;}
+  GS.username=localStorage.getItem('digital_state_username');
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.getElementById('agent-modal').classList.remove('on');
+    document.getElementById('mission-modal').classList.remove('on');
+    if(document.getElementById('s-chronicle').classList.contains('active'))showScreen('s-game');
+    if(document.getElementById('s-vote').classList.contains('active'))showScreen('s-game');
+  }
+});
+</script>
+</body>
+</html>
