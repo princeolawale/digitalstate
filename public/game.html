@@ -1301,10 +1301,6 @@ function gameLoop(){tickEpoch();setTimeout(gameLoop,33);}
 // ════════════════════════════════════
 // INIT CHECK
 // ════════════════════════════════════
-window.addEventListener('load',()=>{
-  if(!localStorage.getItem('digital_state_username')){window.location.href='/landing.html';return;}
-  GS.username=localStorage.getItem('digital_state_username');
-});
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     document.getElementById('agent-modal').classList.remove('on');
@@ -1313,6 +1309,77 @@ document.addEventListener('keydown',e=>{
     if(document.getElementById('s-vote').classList.contains('active'))showScreen('s-game');
   }
 });
+/* =====================================================
+   🔐 DIGITAL STATE – UNIFIED AUTH + LOAD + AUTOSAVE
+   ===================================================== */
+
+   window.addEventListener('load', async () => {
+
+const token = localStorage.getItem('digital_state_token');
+const storedUser = localStorage.getItem('digital_state_username');
+
+// Protect route
+if (!token || !storedUser) {
+  window.location.href = '/landing.html';
+  return;
+}
+
+GS.username = storedUser;
+
+try {
+  const res = await fetch('https://digitalstate-backend.onrender.com/api/game/load', {
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  });
+
+  if (res.ok) {
+    const savedState = await res.json();
+
+    if (savedState && Object.keys(savedState).length > 0) {
+      Object.assign(GS, savedState);
+
+      if (typeof updateStats === "function") updateStats();
+      if (typeof updateBars === "function") updateBars();
+      if (typeof renderAgents === "function") renderAgents();
+      if (typeof renderHierarchy === "function") renderHierarchy();
+      if (typeof renderAllied === "function") renderAllied();
+    }
+  }
+
+} catch (err) {
+  console.error("Load failed:", err);
+}
+});
+
+async function saveGameState(){
+
+const token = localStorage.getItem('digital_state_token');
+if (!token) return;
+
+try {
+  await fetch('https://digitalstate-backend.onrender.com/api/game/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify(GS)
+  });
+} catch (err) {
+  console.error("Save failed:", err);
+}
+}
+
+setInterval(saveGameState, 60000);
+window.addEventListener('beforeunload', saveGameState);
+
+function logout(){
+localStorage.removeItem('digital_state_token');
+localStorage.removeItem('digital_state_username');
+window.location.href = '/landing.html';
+}
+
 </script>
 </body>
 </html>
