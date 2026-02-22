@@ -168,18 +168,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 <body>
 <!-- Globe background -->
 <iframe
-  id="globe-bg"
-  src="/globe"
-  scrolling="no"
-  title="Globe"
-  onload="hideGlobeUI(this)"
-  style="
-    position:fixed;
-    top:0;left:0;
-    width:100%;height:100%;
-    border:none;z-index:0;
-    pointer-events:none;
-    opacity:1;transition:opacity 1.2s ease;
+src="/globe"
+style="
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:none;
+  z-index:-1;
   "
 ></iframe>
 
@@ -227,26 +223,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 <script>
   const CA_ADDRESS = 'COMING_SOON'; // Replace with real CA when ready
   
-  function hideGlobeUI(iframe){
-    try{
-      const doc=iframe.contentDocument||iframe.contentWindow.document;
-      const s=doc.createElement('style');
-      s.textContent=`
-        aside { display:none!important; }
-        button[data-slot="sheet-trigger"] { display:none!important; }
-        [id*="toggle"] { display:none!important; }
-        body > div:not(#__next):not([id]) { display:none!important; }
-        div[style*="cursor: pointer"][style*="left: 0"],
-        div[style*="cursor:pointer"][style*="left:0"],
-        div[style*="position: fixed"][style*="left: 0px"][style*="top: 0px"],
-        div[style*="position:fixed"][style*="left:0"][style*="top:0"] { display:none!important; }
-        #__next { width:100vw!important; }
-        main, [role="main"] { width:100vw!important; padding:0!important; }
-      `;
-      doc.head.appendChild(s);
-    }catch(e){}
-    setTimeout(()=>iframe.style.opacity='1', 400);
-  }
   
   function copyCA(){
     if(CA_ADDRESS === 'COMING_SOON'){
