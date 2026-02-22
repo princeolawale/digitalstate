@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DIGITAL STATE — World Domination</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#b8963e;--gold2:#d4ae5a;--gold3:#f0cc80;
+  --bg:#04060c;--card:rgba(8,11,22,0.97);
+  --border:rgba(184,150,62,0.22);--border2:rgba(184,150,62,0.09);
+  --text:#c8c2b4;--text2:#5e5a52;--text3:#8a8478;
+  --red:#c0392b;--green:#1a7a4a;
+  --ff-title:'Cinzel',serif;--ff-mono:'Share Tech Mono',monospace;--ff-body:'Rajdhani',sans-serif;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--ff-body);-webkit-font-smoothing:antialiased}
+
+/* BG */
+.bg-layer{position:fixed;inset:0;pointer-events:none}
+.bg-grid{
+  background-image:linear-gradient(rgba(184,150,62,0.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(184,150,62,0.035) 1px,transparent 1px);
+  background-size:72px 72px;
+  mask-image:radial-gradient(ellipse 90% 90% at 50% 50%,black 0%,transparent 75%);
+}
+.bg-radial{
+  background:radial-gradient(ellipse 60% 50% at 50% 40%,rgba(184,150,62,0.05) 0%,transparent 70%),
+    radial-gradient(ellipse 30% 40% at 15% 85%,rgba(26,74,122,0.06) 0%,transparent 60%),
+    radial-gradient(ellipse 25% 35% at 85% 15%,rgba(26,74,50,0.05) 0%,transparent 60%);
+}
+.scanlines{
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);
+  z-index:999;
+}
+
+/* LAYOUT */
+.page{
+  position:relative;z-index:1;
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+}
+
+/* HEADER BADGE */
+.badge{
+  font-family:var(--ff-mono);font-size:10px;letter-spacing:4px;
+  color:var(--gold);text-transform:uppercase;
+  border:1px solid var(--border2);padding:5px 16px;
+  margin-bottom:28px;
+  animation:fadeUp 0.6s ease 0.1s both;
+}
+
+/* TITLE */
+.title-wrap{text-align:center;margin-bottom:12px;animation:fadeUp 0.6s ease 0.2s both}
+.title-main{
+  font-family:var(--ff-title);
+  font-size:clamp(48px,9vw,104px);
+  font-weight:900;letter-spacing:6px;text-transform:uppercase;
+  color:#fff;line-height:1;
+  text-shadow:0 0 80px rgba(184,150,62,0.15);
+}
+.title-main .arena{
+  color:transparent;
+  -webkit-text-stroke:1px rgba(184,150,62,0.7);
+}
+.tagline{
+  font-family:var(--ff-mono);font-size:12px;letter-spacing:3px;
+  color:var(--text2);margin-top:16px;text-transform:uppercase;
+  line-height:1.8;
+}
+.tagline em{color:var(--gold);font-style:normal}
+
+/* DIVIDER */
+.divider{
+  width:1px;height:40px;background:linear-gradient(180deg,transparent,var(--border),transparent);
+  margin:24px auto;animation:fadeUp 0.6s ease 0.3s both;
+}
+
+/* LOGIN BOX */
+.login-box{
+  width:100%;max-width:360px;
+  animation:fadeUp 0.6s ease 0.4s both;
+}
+.login-box .lbl{
+  font-family:var(--ff-mono);font-size:9px;letter-spacing:3px;
+  color:var(--text2);text-transform:uppercase;margin-bottom:8px;display:block;
+}
+.login-input{
+  width:100%;padding:13px 16px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border2);
+  color:var(--text);font-family:var(--ff-mono);font-size:14px;letter-spacing:2px;
+  outline:none;transition:border-color 0.2s,background 0.2s;
+  margin-bottom:8px;
+}
+.login-input:focus{border-color:var(--border);background:rgba(184,150,62,0.04)}
+.login-input::placeholder{color:var(--text2);letter-spacing:1px;font-size:12px}
+.login-error{
+  font-family:var(--ff-mono);font-size:10px;letter-spacing:1px;
+  color:var(--red);margin-bottom:8px;min-height:16px;
+}
+.login-btn{
+  width:100%;padding:14px;margin-top:4px;
+  background:transparent;border:1px solid var(--gold);
+  color:var(--gold3);
+  font-family:var(--ff-title);font-size:13px;font-weight:600;letter-spacing:4px;
+  text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;
+  transition:color 0.2s;
+}
+.login-btn::before{
+  content:'';position:absolute;inset:0;background:var(--gold);
+  transform:translateX(-101%);transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.login-btn:hover::before{transform:translateX(0)}
+.login-btn:hover{color:var(--bg)}
+.login-btn span{position:relative;z-index:1}
+.login-hint{
+  font-family:var(--ff-mono);font-size:9px;letter-spacing:1px;
+  color:var(--text2);text-align:center;margin-top:10px;
+}
+.login-hint a{color:var(--gold);text-decoration:none;cursor:pointer}
+
+/* BOTTOM LINKS */
+.bottom-row{
+  position:fixed;bottom:28px;left:0;right:0;
+  display:flex;gap:12px;align-items:stretch;justify-content:center;
+  animation:fadeUp 0.6s ease 0.6s both;
+}
+.bottom-card{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 24px;
+  width:220px;
+  background:rgba(4,6,12,0.7);
+  backdrop-filter:blur(8px);
+  border:1px solid var(--border2);
+  font-family:var(--ff-mono);font-size:10px;letter-spacing:1px;color:var(--text2);
+  transition:border-color 0.15s,color 0.15s;cursor:default;
+  text-decoration:none;
+}
+.bottom-card.clickable{cursor:pointer}
+.bottom-card.clickable:hover{border-color:var(--border);color:var(--text)}
+.ca-badge{
+  font-size:8px;letter-spacing:2px;padding:2px 6px;
+  background:rgba(184,150,62,0.1);border:1px solid var(--border2);color:var(--gold);
+}
+.copy-btn{
+  background:none;border:1px solid var(--border2);padding:3px 8px;
+  font-family:var(--ff-mono);font-size:9px;color:var(--text2);cursor:pointer;
+  transition:all 0.15s;letter-spacing:1px;
+}
+.copy-btn:hover{border-color:var(--border);color:var(--gold)}
+
+/* Globe BG overlay — dim it so text reads */
+#globe-bg{filter:brightness(0.55) saturate(0.8)}
+.bg-layer.bg-grid{mix-blend-mode:overlay}
+
+/* VERSION */
+.version{
+  position:fixed;top:20px;right:24px;
+  font-family:var(--ff-mono);font-size:9px;letter-spacing:2px;color:var(--text2);opacity:0.4;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<!-- Globe background -->
+<iframe
+  id="globe-bg"
+  src="/globe"
+  scrolling="no"
+  title="Globe"
+  onload="hideGlobeUI(this)"
+  style="
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    border:none;z-index:0;
+    pointer-events:none;
+    opacity:0;transition:opacity 1.2s ease;
+  "
+></iframe>
+
+<div class="bg-layer bg-grid"></div>
+<div class="bg-layer scanlines"></div>
+
+<div class="version">BUILD 0.1.0 · ALPHA</div>
+
+<div class="page">
+  <div class="badge">2047 · Multiplayer World Domination</div>
+
+  <div class="title-wrap">
+    <div class="title-main">Digital <span class="arena">State</span></div>
+    <div class="tagline">
+      Every empire begins with a single <em>decision.</em><br>
+      Make yours count — the world is watching.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="login-box">
+    <label class="lbl">Commander Username</label>
+    <input class="login-input" id="username-input" type="text" placeholder="enter your callsign" maxlength="24"
+      onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" onclick="doLogin()"><span>Enter the State</span></button>
+    <div class="login-hint">No account needed &mdash; <a onclick="doLogin()">your callsign is your identity</a></div>
+  </div>
+</div>
+
+<!-- Bottom links -->
+<div class="bottom-row">
+  <div class="bottom-card">
+    <span class="ca-badge">CA</span>
+    <span id="ca-addr">Contract: Coming Soon</span>
+    <button class="copy-btn" id="copy-btn" onclick="copyCA()">COPY</button>
+  </div>
+  <a class="bottom-card clickable" href="https://x.com/DigitalStateGame" target="_blank">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    Follow @DigitalStateGame
+  </a>
+</div>
+
+<script>
+  const CA_ADDRESS = 'COMING_SOON'; // Replace with real CA when ready
+  
+  function hideGlobeUI(iframe){
+    try{
+      const doc=iframe.contentDocument||iframe.contentWindow.document;
+      const s=doc.createElement('style');
+      s.textContent=`
+        aside { display:none!important; }
+        button[data-slot="sheet-trigger"] { display:none!important; }
+        [id*="toggle"] { display:none!important; }
+        body > div:not(#__next):not([id]) { display:none!important; }
+        div[style*="cursor: pointer"][style*="left: 0"],
+        div[style*="cursor:pointer"][style*="left:0"],
+        div[style*="position: fixed"][style*="left: 0px"][style*="top: 0px"],
+        div[style*="position:fixed"][style*="left:0"][style*="top:0"] { display:none!important; }
+        #__next { width:100vw!important; }
+        main, [role="main"] { width:100vw!important; padding:0!important; }
+      `;
+      doc.head.appendChild(s);
+    }catch(e){}
+    setTimeout(()=>iframe.style.opacity='1', 400);
+  }
+  
+  function copyCA(){
+    if(CA_ADDRESS === 'COMING_SOON'){
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'SOON';
+      setTimeout(()=>btn.textContent='COPY', 1500);
+      return;
+    }
+    navigator.clipboard.writeText(CA_ADDRESS).then(()=>{
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'COPIED';
+      setTimeout(()=>btn.textContent='COPY', 2000);
+    });
+  }
+  
+  /* 🔐 REAL BACKEND LOGIN */
+  async function doLogin(){
+    const val = document.getElementById('username-input').value.trim();
+    const err = document.getElementById('login-error');
+  
+    if(!val){ err.textContent = 'Callsign required.'; return; }
+    if(val.length < 3){ err.textContent = 'Minimum 3 characters.'; return; }
+    if(!/^[a-zA-Z0-9_-]+$/.test(val)){ err.textContent = 'Letters, numbers, _ and - only.'; return; }
+  
+    err.textContent = '';
+  
+    try {
+      const res = await fetch('https://digitalstate-backend.onrender.com/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: val })
+      });
+  
+      const data = await res.json();
+  
+      if (!data.token) {
+        err.textContent = 'Login failed.';
+        return;
+      }
+  
+      // Store JWT
+      localStorage.setItem('digital_state_token', data.token);
+  
+      // Optional: keep username for UI display only
+      localStorage.setItem('digital_state_username', val);
+  
+      window.location.href = '/game.html';
+  
+    } catch (e) {
+      err.textContent = 'Server connection failed.';
+    }
+  }
+  </script>
+</body>
+</html>
