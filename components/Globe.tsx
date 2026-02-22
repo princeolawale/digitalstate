@@ -477,7 +477,7 @@ function Globe3D({
     }
   });
 
-  if (loading || points.length === 0) {
+  if (loading) {
     return null;
   }
 
