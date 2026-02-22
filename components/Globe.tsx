@@ -620,7 +620,6 @@ export default function GlobeCanvas({
   landPointsSize = 0.008,
   oceanPointsOpacity = 0.5,
   oceanPointsSize = 0.006,
-  // VFX эффекты
   bloomEnabled = true,
   bloomIntensity = 1.5,
   bloomRadius = 0.8,
@@ -658,7 +657,6 @@ export default function GlobeCanvas({
   landPointsSize?: number;
   oceanPointsOpacity?: number;
   oceanPointsSize?: number;
-  // VFX эффекты
   bloomEnabled?: boolean;
   bloomIntensity?: number;
   bloomRadius?: number;
@@ -671,17 +669,13 @@ export default function GlobeCanvas({
   filmGrainIntensity?: number;
 }) {
 
-  const bgColor = backgroundColor;
-
-  }
-
   return (
     <div
       style={{
-        position: 'fixed',
+        position: "fixed",
         inset: 0,
         zIndex: 0,
-        pointerEvents: 'none',
+        pointerEvents: "none",
       }}
     >
       <Canvas
@@ -704,7 +698,7 @@ export default function GlobeCanvas({
         }}
       >
         <color attach="background" args={["#000000"]} />
-  
+
         <Globe3D
           showBackHemisphere={showBackHemisphere}
           autoRotate={autoRotate}
