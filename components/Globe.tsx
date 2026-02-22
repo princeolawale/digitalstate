@@ -699,25 +699,26 @@ export default function GlobeCanvas({
       }}
     >
       <Canvas
-  camera={{ position: [0, 0, 7], fov: 50 }}
-  gl={{
-    alpha: true,
-    antialias: true,
-    powerPreference: "high-performance",
-    stencil: false,
-    depth: true,
-  }}
-  dpr={[1, 2]}
-  performance={{ min: 0.5 }}
-  frameloop="always"
-  style={{
-    width: "100%",
-    height: "100%",
-    display: "block",
-    background: "transparent",
-  }}
->
-</Canvas>
+        camera={{ position: [0, 0, 7], fov: 50 }}
+        gl={{
+          alpha: true,
+          antialias: true,
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: true,
+        }}
+        dpr={[1, 2]}
+        performance={{ min: 0.5 }}
+        frameloop="always"
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "block",
+          background: "transparent",
+        }}
+      >
+        <color attach="background" args={["#000000"]} />
+  
         <Globe3D
           showBackHemisphere={showBackHemisphere}
           autoRotate={autoRotate}
