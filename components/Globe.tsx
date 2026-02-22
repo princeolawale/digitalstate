@@ -478,7 +478,7 @@ function Globe3D({
   });
 
   if (loading) {
-    return null;
+    console.log("Still loading...");
   }
 
   return (
