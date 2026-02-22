@@ -1,12 +1,7 @@
 export default function Home() {
   return (
-    <iframe
-      src="/landing.html"
-      style={{
-        width: '100vw',
-        height: '100vh',
-        border: 'none'
-      }}
-    />
-  )
+    <div style={{ position: "relative", zIndex: 1 }}>
+      <h1 style={{ color: "white" }}>Landing Page</h1>
+    </div>
+  );
 }
