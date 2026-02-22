@@ -8,7 +8,7 @@ export default function GlobeBackground() {
       style={{
         position: "fixed",
         inset: 0,
-        background: "blue",
+        background: "green",
         zIndex: 0,
       }}
     />
