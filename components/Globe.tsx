@@ -696,34 +696,28 @@ export default function GlobeCanvas({
         inset: 0,
         zIndex: 0,
         pointerEvents: 'none',
-        background: bgColor,
       }}
     >
       <Canvas
-        camera={{ position: [0, 0, 7], fov: 50 }}
-        resize={{ 
-          scroll: false, 
-          debounce: { scroll: 50, resize: 50 },
-          offsetSize: true
-        }}
-        gl={{
-          alpha: true,
-          antialias: true,
-          powerPreference: "high-performance", // Аппаратное ускорение
-          stencil: false,
-          depth: true,
-        }}
-        dpr={[1, 2]} // Ограничиваем pixel ratio для производительности
-        performance={{ min: 0.5 }} // Автоматическая деградация качества при низком FPS
-        frameloop="always"
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "block",
-          background: bgColor,
-        }}
-      >
-        <color attach="background" args={[bgColor]} />
+  camera={{ position: [0, 0, 7], fov: 50 }}
+  gl={{
+    alpha: true,
+    antialias: true,
+    powerPreference: "high-performance",
+    stencil: false,
+    depth: true,
+  }}
+  dpr={[1, 2]}
+  performance={{ min: 0.5 }}
+  frameloop="always"
+  style={{
+    width: "100%",
+    height: "100%",
+    display: "block",
+    background: "transparent",
+  }}
+>
+</Canvas>
         <Globe3D
           showBackHemisphere={showBackHemisphere}
           autoRotate={autoRotate}
