@@ -707,7 +707,7 @@ export default function GlobeCanvas({
           offsetSize: true
         }}
         gl={{
-          alpha: false,
+          alpha: true,
           antialias: true,
           powerPreference: "high-performance", // Аппаратное ускорение
           stencil: false,
