@@ -91,11 +91,8 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-  <GlobeBackground />
-  <div style={{ position: "relative", zIndex: 1 }}>
-    {children}
-  </div>
-</body>
+        {children}
+      </body>
     </html>
-  )
+  );
 }
