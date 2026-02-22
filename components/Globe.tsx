@@ -690,7 +690,15 @@ export default function GlobeCanvas({
   }
 
   return (
-    <div className="w-full h-full" style={{ background: bgColor, position: 'relative' }}>
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: 'none',
+        background: bgColor,
+      }}
+    >
       <Canvas
         camera={{ position: [0, 0, 7], fov: 50 }}
         resize={{ 
