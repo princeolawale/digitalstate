@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import GlobeBackground from '@/components/Globe'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
 
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
 }
 
 /* =========================
-   VIEWPORT (REQUIRED SEPARATE EXPORT)
+   VIEWPORT
 ========================= */
 export const viewport: Viewport = {
   width: 'device-width',
@@ -89,9 +90,12 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={inter.className}>
-        {children}
-      </body>
+      <body className={inter.className} style={{ background: "purple" }}>
+  <GlobeBackground />
+  <div style={{ position: "relative", zIndex: 1 }}>
+    {children}
+  </div>
+</body>
     </html>
   )
 }
