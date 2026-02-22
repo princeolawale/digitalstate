@@ -1,6 +1,6 @@
 "use client"
 
-import Globe from "./Glbe"
+import Globe from "./Globe"
 
 export default function GlobeBackground() {
   return (
