@@ -1,7 +1,18 @@
 export default function Home() {
   return (
-    <div style={{ position: "relative", zIndex: 1 }}>
-      <h1 style={{ color: "white" }}>Landing Page</h1>
+    <div
+      style={{
+        position: "relative",
+        zIndex: 1,
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "white",
+        fontSize: "2rem",
+      }}
+    >
+      DIGITAL STATE
     </div>
   );
 }
