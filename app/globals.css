@@ -189,6 +189,7 @@ nextjs-portal { display: none !important; }
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    color: var(--foreground);
+    background: transparent !important;
   }
 }
