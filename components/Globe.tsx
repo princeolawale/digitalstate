@@ -670,23 +670,9 @@ export default function GlobeCanvas({
   filmGrainEnabled?: boolean;
   filmGrainIntensity?: number;
 }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const bgColor = backgroundColor;
 
-  if (!mounted) {
-    return (
-      <div
-        className="w-full h-full flex items-center justify-center"
-        style={{ background: bgColor }}
-      >
-        <div className="text-muted-foreground text-xl">Загрузка глобуса...</div>
-      </div>
-    );
   }
 
   return (
